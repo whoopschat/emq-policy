@@ -1,7 +1,7 @@
 %%%--------------------------------------------------------------------------------
 %% emq_policy_server_base_binary
 %%
-%% Copyright (c) 2017 Whoopschat
+%% Copyright (c) 2017 WhoopsChat
 %%
 %% Permission is hereby granted, free of charge, to any person obtaining a copy
 %% of this software and associated documentation files (the "Software"), to deal
