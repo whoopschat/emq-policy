@@ -1,7 +1,6 @@
 .eunit
 *.o
 *.plt
-emq_hook_http.d
 erl_crash.dump
 .concrete/DEV_MODE
 .rebar
@@ -9,3 +8,4 @@ erl_crash.dump
 rel/
 deps/
 ebin/
+build/
