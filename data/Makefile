@@ -6,16 +6,16 @@ PROJECT_VERSION = 2.3.5
 DEPS = goldrush
 dep_goldrush = git https://github.com/basho/goldrush 0.1.9
 
-DEPS += emqttd emq_dashboard emq_retainer emq_recon emq_reloader \
-        emq_sn emq_coap emq_stomp \
-        emq_lwm2m
+DEPS += emqttd emq_modules emq_dashboard emq_retainer emq_recon emq_reloader \
+        emq_sn emq_coap emq_stomp
 
-# whoopschat policy
+# emq policy server
 DEPS += emq_policy_server
-dep_emq_policy_server = git https://github.com/whoopschat/emq-policy-server master
+dep_emq_policy_server = git https://github.com/whoopschat/emq-policy-server
 
 # emq deps
 dep_emqttd        = git https://github.com/emqtt/emqttd master
+dep_emq_modules   = git https://github.com/emqtt/emq-modules master
 dep_emq_dashboard = git https://github.com/emqtt/emq-dashboard master
 dep_emq_retainer  = git https://github.com/emqtt/emq-retainer master
 dep_emq_recon     = git https://github.com/emqtt/emq-recon master
@@ -25,7 +25,6 @@ dep_emq_reloader  = git https://github.com/emqtt/emq-reloader master
 dep_emq_sn    = git https://github.com/emqtt/emq-sn master
 dep_emq_coap  = git https://github.com/emqtt/emq-coap master
 dep_emq_stomp = git https://github.com/emqtt/emq-stomp master
-dep_emq_lwm2m = git https://github.com/emqtt/emq-lwm2m master
 
 # COVER = true
 
@@ -38,6 +37,8 @@ plugins:
 		if [ "emq.conf" = "$${conf##*/}" ] ; then \
 			cp $${conf} rel/conf/ ; \
 		elif [ "acl.conf" = "$${conf##*/}" ] ; then \
+			cp $${conf} rel/conf/ ; \
+		elif [ "ssl_dist.conf" = "$${conf##*/}" ] ; then \
 			cp $${conf} rel/conf/ ; \
 		else \
 			cp $${conf} rel/conf/plugins ; \

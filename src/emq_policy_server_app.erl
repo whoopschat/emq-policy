@@ -32,7 +32,7 @@
 start(_StartType, _StartArgs) ->
   reg_auth(),
   reg_acl(),
-  {ok, Sup} = emq_policy_server_module_super:start_link(),
+  {ok, Sup} = emq_policy_server_app_super:start_link(),
   emq_policy_server_module_connect:load(application:get_all_env()),
   emq_policy_server_module_group:load(application:get_all_env()),
   emq_policy_server_module_hook:load(application:get_all_env()),
