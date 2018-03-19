@@ -27,7 +27,7 @@
 -behaviour(emqttd_acl_mod).
 
 %% include
--include("whoopschat_emq_policy.hrl").
+-include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
 %% Callbacks

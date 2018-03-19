@@ -25,7 +25,7 @@
 -module(emq_policy_server_module_group).
 
 %% include
--include("whoopschat_emq_policy.hrl").
+-include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 -include_lib("emqttd/include/emqttd_protocol.hrl").
 

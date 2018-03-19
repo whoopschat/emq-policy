@@ -27,7 +27,7 @@
 -behaviour(emqttd_auth_mod).
 
 %% include
--include("whoopschat_emq_policy.hrl").
+-include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
 -import(emq_policy_server_base_app, [parser_app_by_client/1, parser_device_by_client/1, validate_system_format/2, validate_client_format/2]).
