@@ -3,6 +3,7 @@
 BUILD_DIR=$(pwd)/build
 EMQ_DIR=$BUILD_DIR/emq-relx
 EMQ_REPO_GIT=https://github.com/emqtt/emq-relx
+EMQ_REPO_GIT_VERSION=2.3.5
 
 if [ -d $BUILD_DIR ]; then
 else

@@ -24,7 +24,7 @@
 
 -module(emq_policy_server_base_http).
 
--include("whoopschat_emq_policy.hrl").
+-include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
 -export([request/3, env_http_request/0]).
