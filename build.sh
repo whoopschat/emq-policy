@@ -13,7 +13,7 @@ echo ""
 mkdir $BUILD_DIR
 fi
 
-echo " ================> Pull emq-relx from git"
+echo "Pull emq-relx from git"
 
 if [ -d $EMQ_DIR ]; then
 cd $EMQ_DIR
@@ -23,15 +23,11 @@ cd $BUILD_DIR
 git clone -b release $EMQ_REPO_GIT
 fi
 
-echo " ================> Replacement Makefile configuration"
-
+echo "Make"
 cd $(pwd)
 cp $DATA_DIR/Makefile $EMQ_DIR/Makefile
-
-
-echo " ================> Make"
+cp $DATA_DIR/relx.config $EMQ_DIR/relx.config
 cd $EMQ_DIR
-
-# make
+make
 
 
