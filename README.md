@@ -24,6 +24,9 @@ dep_emq_policy_server = git https://github.com/whoopschat/emq-policy-server mast
 ```
 make
 ```
+
 ## Author
 * [WhoopsChat](https://github.com/whoopschat)
 
+## LICENSE
+The MIT License (MIT)
