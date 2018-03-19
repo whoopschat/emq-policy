@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # emq-relx
-EMQ_REL_X_REPO=./emq-relx
+EMQ_REL_X_REPO=$(pwd)/emq-relx
 EMQ_REL_X_GIT=https://github.com/emqtt/emq-relx
 
 echo "Pull emq-relx SDK from git"
