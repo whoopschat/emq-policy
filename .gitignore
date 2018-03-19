@@ -1,0 +1,11 @@
+.eunit
+*.o
+*.plt
+emq_hook_http.d
+erl_crash.dump
+.concrete/DEV_MODE
+.rebar
+.erlang.mk/
+rel/
+deps/
+ebin/
