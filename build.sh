@@ -9,21 +9,22 @@ EMQ_REL_X_REPO_GIT=https://github.com/emqtt/emq-relx
 EMQ_REL_X_REPO_GIT_BRANCH=release
 EMQ_REL_X_REPO_GIT_VERSION=2.3.5
 
-EMQ_BUILD_DIR=${EMQ_DIR}/_rel/emqttd
-EMQ_BUILD_TARGET=${BUILD_DIR}/release_emqttd_${EMQ_REL_X_REPO_GIT_VERSION}.zip
+EMQ_RELEASE_DIR=${EMQ_DIR}/_rel
+EMQ_RELEASE_TARGET=${BUILD_DIR}/release_emqttd_${EMQ_REL_X_REPO_GIT_VERSION}.zip
 
 if [ ! -d ${BUILD_DIR} ]; then
 mkdir ${BUILD_DIR}
 fi
 
-if [ -d ${EMQ_BUILD_DIR} ]; then
-rm -rf ${EMQ_BUILD_DIR}
+if [ -d ${EMQ_RELEASE_DIR} ]; then
+rm -rf ${EMQ_RELEASE_DIR}
 fi
 
-if [ -d ${EMQ_BUILD_TARGET} ]; then
-rm -rf ${EMQ_BUILD_TARGET}
+if [ -d ${EMQ_RELEASE_TARGET} ]; then
+rm -rf ${EMQ_RELEASE_TARGET}
 fi
 
+echo -e
 echo "======================================="
 echo "|       Pull emq-relx from git        |"
 echo "======================================="
@@ -54,8 +55,9 @@ echo "|            Compression              |"
 echo "======================================="
 echo -e
 
-cd ${EMQ_BUILD_DIR}
-zip -r -q -o ${EMQ_BUILD_TARGET}  ./
+cd ${EMQ_RELEASE_DIR}
+zip -r -q -o ${EMQ_RELEASE_TARGET}  ./
 
-echo "Done, release path : ${EMQ_BUILD_TARGET}"
+echo "Done, release path : ${EMQ_RELEASE_TARGET}"
+echo -e
 
