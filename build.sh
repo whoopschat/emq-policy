@@ -4,6 +4,7 @@ CURRENT_DIR=$(pwd)
 BUILD_DIR=${CURRENT_DIR}/build
 DATA_DIR=${CURRENT_DIR}/data
 EMQ_DIR=${BUILD_DIR}/emq-relx
+PROJECT_DEP_DIR=${EMQ_DIR}/deps/emq_policy_server
 
 EMQ_REL_X_REPO_GIT=https://github.com/emqtt/emq-relx
 EMQ_REL_X_REPO_GIT_BRANCH=release
@@ -22,6 +23,10 @@ fi
 
 if [ -d ${EMQ_RELEASE_TARGET} ]; then
 rm -rf ${EMQ_RELEASE_TARGET}
+fi
+
+if [ -d ${PROJECT_DEP_DIR} ]; then
+rm -rf ${PROJECT_DEP_DIR}
 fi
 
 echo -e
