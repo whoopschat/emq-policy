@@ -1,5 +1,5 @@
 PROJECT = emq_policy_server
-PROJECT_DESCRIPTION = policy server for EMQ
+PROJECT_DESCRIPTION = EMQ Policy Server
 PROJECT_VERSION = 1.0.0
 
 BUILD_DEPS = emqttd cuttlefish
