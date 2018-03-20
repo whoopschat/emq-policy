@@ -1,5 +1,5 @@
 ## EMQ-POLICY-SERVER
-EMQ Policy Server Plugin
+EMQ policy server plugin
 
 ## Get Started
 * run `./pull.sh` pull project
