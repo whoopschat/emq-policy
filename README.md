@@ -3,7 +3,7 @@ EMQ Policy Server Plugin
 
 ## Get Started
 * run `./pull.sh` pull project
-* run `./release.sh` make `emq-relx`
+* run `./release.sh` make `release_emqtted_xxx.zip`
 * run `./start.sh` start `emqttd console`
 
 ## Author
