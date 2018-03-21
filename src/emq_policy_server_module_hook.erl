@@ -116,6 +116,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
   Mod = hook,
   Params = [
     {server_key, ServerKey}
+    , {app_id, parser_app_by_clientId(ClientId)}
     , {mod, Mod}
     , {action, Action}
     , {client_id, ClientId}
@@ -127,6 +128,7 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
   Mod = hook,
   Params = [
     {server_key, ServerKey}
+    , {app_id, parser_app_by_clientId(ClientId)}
     , {mod, Mod}
     , {action, Action}
     , {client_id, ClientId}

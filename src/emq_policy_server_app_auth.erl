@@ -22,7 +22,7 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_module_auth).
+-module(emq_policy_server_app_auth).
 
 -behaviour(emqttd_auth_mod).
 
@@ -30,7 +30,9 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_base_app, [validate_clientId/2]).
+-import(emq_policy_server_base_app, [validate_clientId/2, parser_app_by_clientId/1]).
+-import(emq_policy_server_base_http, [requestSync/3, env_http_request/0]).
+-import(emq_policy_server_base_binary, [trimBOM/1]).
 
 -define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
 
@@ -46,9 +48,49 @@ check(#mqtt_client{username = Username, client_id = ClientId}, Password, _Env) -
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
+      request_auth_hook(ClientId, Username, Password, auth, env_http_request()),
       {ok, false};
     true ->
       {error, "ClientId Format Error"}
   end.
+
+
+%%--------------------------------------------------------------------
+%% Request Hook
+%%--------------------------------------------------------------------
+
+request_auth_hook(ClientId, Username, Password, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+  Mod = hook,
+  Params = [
+    {server_key, ServerKey}
+    , {app_id, parser_app_by_clientId(ClientId)}
+    , {mod, Mod}
+    , {action, Action}
+    , {client_id, ClientId}
+    , {username, Username}
+    , {password, Password}
+  ],
+  case requestSync(Method, Url, Params) of {ok, 200, Body} ->
+    Json = trimBOM(list_to_binary(Body)),
+    IsJson = jsx:is_json(Json),
+    if
+      IsJson ->
+        handleAuthResult(Json);
+      true ->
+        io:format("auth system log[error]:~nauth return json format error~n=====================================================~n"),
+        {error, "auth return json error"}
+    end;
+    {ok, Code, _Body} ->
+      {error, Code};
+    {error, Error} ->
+      {error, Error}
+  end.
+
+handleAuthResult(_Json) ->
+%%  BodyObj = jsx:decode(Json),
+%%  {_, Code} = lists:keyfind(<<"code">>, 1, BodyObj),
+%%  {_, Msg} = lists:keyfind(<<"msg">>, 1, BodyObj),
+%%  io:format("auth system log[error]:~nauth return json format error~n=====================================================~n"),
+  {ok, false}.
 
 description() -> "Emq Policy Server AUTH module".

@@ -22,7 +22,7 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_module_acl).
+-module(emq_policy_server_app_acl).
 
 -behaviour(emqttd_acl_mod).
 

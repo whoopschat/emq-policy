@@ -40,9 +40,9 @@ stop(_State) ->
   emq_policy_server_module_hook:unload().
 
 reg_auth() ->
-  emqttd_access_control:register_mod(auth, emq_policy_server_module_auth, undefined),
+  emqttd_access_control:register_mod(auth, emq_policy_server_app_auth, undefined),
   ok.
 
 reg_acl() ->
-  emqttd_access_control:register_mod(acl, emq_policy_server_module_acl, undefined),
+  emqttd_access_control:register_mod(acl, emq_policy_server_app_acl, undefined),
   ok.
