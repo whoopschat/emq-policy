@@ -34,7 +34,7 @@ env_http_request() ->
   Method = proplists:get_value(method, Config, post),
   Url = proplists:get_value(url, Config),
   ServerKey = proplists:get_value(server_key, Config),
-  #http_request{method = Method, url = Url, server_key = ServerKey}.
+  #http_request{url = Url, method = Method, server_key = ServerKey}.
 
 %%--------------------------------------------------------------------
 %% HTTP Request
