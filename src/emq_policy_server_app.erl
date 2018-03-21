@@ -44,5 +44,5 @@ reg_auth() ->
   ok.
 
 reg_acl() ->
-%%  emqttd_access_control:register_mod(acl, emq_policy_server_module_acl, undefined),
+  emqttd_access_control:register_mod(acl, emq_policy_server_module_acl, undefined),
   ok.

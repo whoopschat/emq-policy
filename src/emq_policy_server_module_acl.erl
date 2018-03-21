@@ -36,9 +36,12 @@
 init(Env) ->
   {ok, Env}.
 
-check_acl({_Client, _PubSub, _Topic}, _Env) ->
-  deny.
+check_acl({_Client, PubSub, _Topic}, _Env) ->
+  access(PubSub).
 
 reload_acl(_State) -> ok.
+
+access(subscribe) -> deny;
+access(publish) -> allow.
 
 description() -> "Emq Policy Server ACL module".

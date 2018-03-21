@@ -43,6 +43,7 @@ cd ${BUILD_DIR}
 git clone -b ${EMQ_REL_X_REPO_GIT_BRANCH} ${EMQ_REL_X_REPO_GIT}
 fi
 
+echo -e
 echo "======================================="
 echo "|               Building              |"
 echo "======================================="
@@ -54,7 +55,6 @@ cp ${DATA_DIR}/relx.config ${EMQ_DIR}/relx.config
 cd ${EMQ_DIR}
 rm -rf ${EMQ_DIR}/deps/emp_policy_server
 make
-
 
 if [ ! -d ${EMQ_RELEASE_DIR} ]; then
 echo -e
