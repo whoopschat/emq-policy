@@ -46,7 +46,7 @@ request(get, Url, Params) ->
 
 request(post, Url, Params) ->
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
-  reply_response(httpc:request(post, Req, [{autoredirect, true}], [])).
+  reply_response(httpc:request(post, Req, [{autoredirect, true}], [{sync, false}])).
 
 reply_response({ok, {{_, Code, _}, _Headers, Body}}) ->
   {ok, Code, Body};
