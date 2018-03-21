@@ -43,9 +43,7 @@
 {translation, "emq_policy_server.api", fun(Conf) ->
   case cuttlefish:conf_get("emq_policy_server.api", Conf, undefined) of
     undefined -> cuttlefish:unset();
-    Url -> Params = cuttlefish:conf_get("emq_policy_server.api.params", Conf),
-           [{url, Url}, {method, cuttlefish:conf_get("emq_policy_server.api.method", Conf)},
-            {server_id, cuttlefish:conf_get("emq_policy_server.api.server_id", Conf)},
-            {params, [list_to_tuple(string:tokens(S, "=")) || S <- string:tokens(Params, ",")]}]
+    Url -> [{url, Url}, {method, cuttlefish:conf_get("emq_policy_server.api.method", Conf)},
+            {server_key, cuttlefish:conf_get("emq_policy_server.api.server_key", Conf)}]
   end
 end}.
