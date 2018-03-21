@@ -41,9 +41,17 @@ env_http_request() ->
 %%--------------------------------------------------------------------
 
 request(get, Url, Params) ->
+  io:format("get start : ~s~n", [Url]),
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
   Timeout = 3000,
   httpc:request(get, Req, [{autoredirect, true}], [{timeout, Timeout}, {connect_timeout, Timeout}, {sync, false}]),
+  receive {http, {RequestId, Result}} ->
+    io:format("get success"),
+    ok
+  after 500 ->
+    error
+  end,
+  io:format("get return : ~s~n", [Url]),
   ok;
 request(post, Url, Params) ->
   io:format("post start : ~s~n", [Url]),
@@ -51,7 +59,11 @@ request(post, Url, Params) ->
   Timeout = 3000,
   {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{timeout, Timeout}, {connect_timeout, Timeout}, {sync, false}]),
   receive {http, {RequestId, Result}} ->
-    io:format("post : ~s~n", [Result]), Result after 500 -> error end,
+    io:format("post success"),
+    ok
+  after 500 ->
+    error
+  end,
   io:format("post return : ~s~n", [Url]),
   ok.
 
