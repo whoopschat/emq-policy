@@ -105,7 +105,7 @@ hook_message_delivered(ClientId, Username, Message = #mqtt_message{topic = Topic
 %% hook message ask
 hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   io:format("hook log (message.acked):~nclient(~s/~s) acked: ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
-  request_message_hook(Topic, Payload, ClientId, Username, message_delivered, env_http_request()),
+  request_message_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
   {ok, Message}.
 
 %%--------------------------------------------------------------------
