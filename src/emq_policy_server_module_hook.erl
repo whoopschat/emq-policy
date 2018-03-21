@@ -42,13 +42,20 @@ load(Env) ->
   emqttd:hook('client.disconnected', fun ?MODULE:hook_client_disconnected/3, [Env]),
   emqttd:hook('message.publish', fun ?MODULE:hook_message_publish/2, [Env]),
   emqttd:hook('message.delivered', fun ?MODULE:hook_message_delivered/4, [Env]),
-  emqttd:hook('message.acked', fun ?MODULE:hook_message_ack/4, [Env]).
+  emqttd:hook('message.acked', fun ?MODULE:hook_message_ack/4, [Env]),
+  receiveHook().
 unload() ->
   emqttd:unhook('client.connected', fun ?MODULE:hook_client_connected/3),
   emqttd:unhook('client.disconnected', fun ?MODULE:hook_client_disconnected/3),
   emqttd:unhook('message.publish', fun ?MODULE:hook_message_publish/2),
   emqttd:unhook('message.delivered', fun ?MODULE:hook_message_delivered/4),
   emqttd:unhook('message.acked', fun ?MODULE:hook_message_ack/4).
+
+receiveHook() ->
+  receive {http, {RequestId, _Result}} ->
+    io:format("RequestId ~s~n", [RequestId]),
+    ok end,
+  ok;
 
 %%--------------------------------------------------------------------
 %% Client Hook
