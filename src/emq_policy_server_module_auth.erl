@@ -22,7 +22,7 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_app_auth).
+-module(emq_policy_server_module_auth).
 
 -behaviour(emqttd_auth_mod).
 
@@ -30,9 +30,9 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_base_app, [validate_clientId/2, parser_app_by_clientId/1]).
--import(emq_policy_server_base_http, [requestSync/3, env_http_request/0]).
--import(emq_policy_server_base_binary, [trimBOM/1]).
+-import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1]).
+-import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
+-import(emq_policy_server_util_binary, [trimBOM/1]).
 
 -define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
 
@@ -63,7 +63,7 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
   Params = [
     {server_key, ServerKey}
     , {app_id, parser_app_by_clientId(ClientId)}
-    , {mod, Mod}
+    , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
     , {username, Username}

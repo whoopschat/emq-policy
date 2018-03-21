@@ -22,7 +22,7 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_base_http).
+-module(emq_policy_server_util_http).
 
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").

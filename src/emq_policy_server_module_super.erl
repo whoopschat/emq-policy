@@ -22,7 +22,7 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_app_super).
+-module(emq_policy_server_module_super).
 
 -behaviour(supervisor).
 

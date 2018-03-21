@@ -22,36 +22,44 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_app_acl).
-
--behaviour(emqttd_acl_mod).
+-module(emq_policy_server_util_format).
 
 %% include
--include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_base_app, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
+-export([parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
 
-%% Callbacks
--export([init/1, check_acl/2, reload_acl/1, description/0]).
-
-init(Env) ->
-  {ok, Env}.
-
-check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
-  access(PubSub, ClientId, Topic).
-
-reload_acl(_State) -> ok.
-
-access(subscribe, _ClientId, _Topic) -> deny;
-access(publish, ClientId, Topic) ->
-  App = parser_app_by_clientId(ClientId),
-  IsTopic = string:str(binary_to_list(Topic), "$" ++ App ++ "/") > 0,
+%%　client : $client/{$app_id}/{$device}/{$username}/
+parser_app_by_clientId(ClientId) ->
+  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
+  Len = erlang:length(ClientSplit),
   if
-    IsTopic ->
-      allow;
+    Len >= 2 ->
+      lists:nth(2, ClientSplit);
     true ->
-      deny
+      ""
   end.
 
-description() -> "Emq Policy Server ACL module".
+%%　client : $client/{$app_id}/{$device}/{$username}/
+parser_device_by_clientId(ClientId) ->
+  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
+  Len = erlang:length(ClientSplit),
+  if
+    Len >= 3 ->
+      lists:nth(3, ClientSplit);
+    true ->
+      ""
+  end.
+
+%%　validate clientId format
+validate_clientId(ClientId, Username) ->
+  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
+  Len = erlang:length(ClientSplit),
+  if
+    Len >= 4 ->
+      string:equal(binary_to_list(ClientId), "$client/" ++ lists:nth(2, ClientSplit) ++ "/" ++ lists:nth(3, ClientSplit) ++ "/" ++ binary_to_list(Username) ++ "/");
+    true ->
+      false
+  end.
+
+

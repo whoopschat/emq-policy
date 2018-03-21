@@ -1,5 +1,5 @@
 %%%--------------------------------------------------------------------------------
-%% emq_policy_server_base_binary
+%% emq_policy_server_util_binary
 %%
 %% Copyright (c) 2017 WhoopsChat
 %%
@@ -22,7 +22,7 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_base_binary).
+-module(emq_policy_server_util_binary).
 %% Bytes
 -export([reverse/1
   , join/2

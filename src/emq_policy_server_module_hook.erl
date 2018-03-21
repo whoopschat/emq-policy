@@ -28,8 +28,8 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_base_app, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
--import(emq_policy_server_base_http, [request/3, env_http_request/0]).
+-import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
+-import(emq_policy_server_util_http, [request/3, env_http_request/0]).
 
 -export([load/1, unload/0]).
 
@@ -117,7 +117,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
   Params = [
     {server_key, ServerKey}
     , {app_id, parser_app_by_clientId(ClientId)}
-    , {mod, Mod}
+    , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
     , {username, Username}
@@ -129,7 +129,7 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
   Params = [
     {server_key, ServerKey}
     , {app_id, parser_app_by_clientId(ClientId)}
-    , {mod, Mod}
+    , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
     , {username, Username}
