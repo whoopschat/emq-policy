@@ -46,7 +46,7 @@ reload_acl(_State) -> ok.
 access(subscribe, _ClientId, _Topic) -> deny;
 access(publish, ClientId, Topic) ->
   App = parser_app_by_clientId(ClientId),
-  IsTopic = string:str(binary_to_list(Topic), "$" ++ binary_to_list(App)) > 0,
+  IsTopic = string:str(binary_to_list(Topic), "$" ++ App ++ "/") > 0,
   if
     IsTopic ->
       allow;

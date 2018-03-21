@@ -27,7 +27,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--export([request/3, env_http_request/0]).
+-export([request/3, requestSync/3, env_http_request/0]).
 
 env_http_request() ->
   Config = application:get_env(emq_policy_server, api, undefined),
@@ -48,6 +48,22 @@ request(post, Url, Params) ->
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
   httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
   ok.
+
+
+requestSync(get, Url, Params) ->
+  Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
+  reply_response(httpc:request(get, Req, [{autoredirect, true}], []));
+
+requestSync(post, Url, Params) ->
+  Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
+  reply_response(httpc:request(post, Req, [{autoredirect, true}], [])).
+
+reply_response({ok, {{_, Code, _}, _Headers, Body}}) ->
+  {ok, Code, Body};
+reply_response({ok, Code, Body}) ->
+  {ok, Code, Body};
+reply_response({error, Error}) ->
+  {error, Error}.
 
 
 
