@@ -55,7 +55,7 @@ receiveHook() ->
   receive {http, {RequestId, _Result}} ->
     io:format("RequestId ~s~n", [RequestId]),
     ok end,
-  ok;
+  ok.
 
 %%--------------------------------------------------------------------
 %% Client Hook
