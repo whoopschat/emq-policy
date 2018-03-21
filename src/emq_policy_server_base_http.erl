@@ -43,17 +43,19 @@ env_http_request() ->
 request(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
   {ok, RequestId} = http:request(get, Req, [{autoredirect, true}], [{sync, false}]),
-  handleResult(RequestId),
+  receive {http, {RequestId, Result}} ->
+    handleResult(Result),
+    ok end,
   ok;
 request(post, Url, Params) ->
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
   {ok, RequestId} = http:request(post, Req, [{autoredirect, true}], [{sync, false}]),
-  handleResult(RequestId),
+  receive {http, {RequestId, Result}} ->
+    handleResult(Result),
+    ok end,
   ok.
 
-handleResult(RequestId) ->
-  receive {http, {RequestId, Result}} ->
-    ok after 5000 -> error end.
+handleResult(Result) -> ok.
 
 
 
