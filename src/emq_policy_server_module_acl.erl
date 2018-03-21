@@ -30,18 +30,28 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
+-import(emq_policy_server_base_app, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
+
 %% Callbacks
 -export([init/1, check_acl/2, reload_acl/1, description/0]).
 
 init(Env) ->
   {ok, Env}.
 
-check_acl({_Client, PubSub, _Topic}, _Env) ->
-  access(PubSub).
+check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
+  access(PubSub, ClientId, Topic).
 
 reload_acl(_State) -> ok.
 
-access(subscribe) -> deny;
-access(publish) -> allow.
+access(subscribe, _ClientId, _Topic) -> deny;
+access(publish, ClientId, Topic) ->
+  App = parser_app_by_clientId(ClientId),
+  IsTopic = string:str(binary_to_list(Topic), "$" ++ binary_to_list(App)) > 0,
+  if
+    IsTopic ->
+      allow;
+    true ->
+      deny
+  end.
 
 description() -> "Emq Policy Server ACL module".
