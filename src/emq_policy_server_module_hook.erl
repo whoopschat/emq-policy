@@ -97,11 +97,11 @@ hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payl
 request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = hook,
   case request(Method, Url,
-    [("client_id" = ServerKey)
-      , ("mod" = Mod)
-      , ("action" = Action)
-      , ("client_id" = ClientId)
-      , ("username" = Username)]) of
+    [("client_id" : ServerKey)
+      , ("mod" : Mod)
+      , ("action" : Action)
+      , ("client_id" : ClientId)
+      , ("username" : Username)]) of
     {ok, 200, _Body} ->
       ok;
     {ok, _Code, _Body} ->
@@ -113,13 +113,13 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
 request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = hook,
   case request(Method, Url,
-    [("client_id" = ServerKey)
-      , ("mod" = Mod)
-      , ("action" = Action)
-      , ("client_id" = ClientId)
-      , ("username" = Username)
-      , ("topic" = Topic)
-      , ("payload" = Payload)]) of
+    [("client_id" : ServerKey)
+      , ("mod" : Mod)
+      , ("action" :Action)
+      , ("client_id" : ClientId)
+      , ("username" : Username)
+      , ("topic" : Topic)
+      , ("payload" : Payload)]) of
     {ok, 200, _Body} ->
       ok;
     {ok, _Code, _Body} ->
