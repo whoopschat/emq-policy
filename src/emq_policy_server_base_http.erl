@@ -43,12 +43,23 @@ env_http_request() ->
 request(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
   {ok, RequestId} = httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
+  receive {http, {RequestId, _Result}} -> ok after 0 -> error end,
+  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> error end,
+  receive {http, {RequestId, stream_start, _Headers}} -> ok after 0 -> error end,
+  receive {http, {RequestId, stream, _BinBodyPart}} -> ok after 0 -> error end,
+  receive {http, {RequestId, stream_end, _Headers}} -> ok after 0 -> error end,
+  receive {http, {RequestId, saved_to_file}} -> ok after 0 -> error end,
   ok;
 request(post, Url, Params) ->
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
-  httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
+  {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
+  receive {http, {RequestId, _Result}} -> ok after 0 -> error end,
+  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> error end,
+  receive {http, {RequestId, stream_start, _Headers}} -> ok after 0 -> error end,
+  receive {http, {RequestId, stream, _BinBodyPart}} -> ok after 0 -> error end,
+  receive {http, {RequestId, stream_end, _Headers}} -> ok after 0 -> error end,
+  receive {http, {RequestId, saved_to_file}} -> ok after 0 -> error end,
   ok.
-
 
 requestSync(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
