@@ -36,11 +36,7 @@
   {datatype, {enum, [post, get]}}
 ]}.
 
-{mapping, "emq_policy_server.api.params", "emq_policy_server.api", [
-  {datatype, string}
-]}.
-
-{mapping, "emq_policy_server.api.server_id", "emq_policy_server.api", [
+{mapping, "emq_policy_server.api.server_key", "emq_policy_server.api", [
   {datatype, string}
 ]}.
 

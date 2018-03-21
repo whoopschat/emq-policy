@@ -22,4 +22,4 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--record(http_request, {method = post, server_id, url, params}).
+-record(http_request, {method = post, server_key, url}).

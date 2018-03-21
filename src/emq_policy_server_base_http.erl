@@ -33,9 +33,8 @@ env_http_request() ->
   Config = application:get_env(emq_policy_server, api, undefined),
   Method = proplists:get_value(method, Config, post),
   Url = proplists:get_value(url, Config),
-  Params = proplists:get_value(params, Config),
-  ServerId = proplists:get_value(server_id, Config),
-  #http_request{method = Method, url = Url, params = Params, server_id = ServerId}.
+  ServerKey = proplists:get_value(server_key, Config),
+  #http_request{method = Method, url = Url, server_key = ServerKey}.
 
 %%--------------------------------------------------------------------
 %% HTTP Request
