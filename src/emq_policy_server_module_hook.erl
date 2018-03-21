@@ -120,14 +120,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
     , {client_id, ClientId}
     , {username, Username}
   ],
-  case request(Method, Url, Params) of
-    {ok, 200, _Body} ->
-      ok;
-    {ok, _Code, _Body} ->
-      error;
-    {error, _Error} ->
-      error
-  end.
+  request(Method, Url, Params).
 
 request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = hook,
@@ -140,11 +133,4 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
     , {topic, Topic}
     , {payload, Payload}
   ],
-  case request(Method, Url, Params) of
-    {ok, 200, _Body} ->
-      ok;
-    {ok, _Code, _Body} ->
-      error;
-    {error, _Error} ->
-      error
-  end.
+  request(Method, Url, Params).

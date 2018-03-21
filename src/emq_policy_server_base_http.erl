@@ -42,12 +42,10 @@ env_http_request() ->
 
 request(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
-  {ok, RequestId} = httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
-  ok;
+  httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]);
 request(post, Url, Params) ->
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
-  {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
-  ok.
+  httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]).
 
 
 
