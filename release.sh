@@ -55,14 +55,17 @@ cd ${EMQ_DIR}
 rm -rf ${EMQ_DIR}/deps/emp_policy_server
 make
 
+
+if [ ! -d ${EMQ_RELEASE_DIR} ]; then
+echo "Failure"
+else
 echo "======================================="
 echo "|            Compression              |"
 echo "======================================="
 echo -e
-
 cd ${EMQ_RELEASE_DIR}
 zip -r -q -o ${EMQ_RELEASE_TARGET}  ./
-
-echo "Done, release path : ${EMQ_RELEASE_TARGET}"
+echo "Success , release path : ${EMQ_RELEASE_TARGET}"
+fi
 echo -e
 
