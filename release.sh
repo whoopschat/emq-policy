@@ -57,8 +57,10 @@ make
 
 
 if [ ! -d ${EMQ_RELEASE_DIR} ]; then
+echo -e
 echo "Failure"
 else
+echo -e
 echo "======================================="
 echo "|            Compression              |"
 echo "======================================="

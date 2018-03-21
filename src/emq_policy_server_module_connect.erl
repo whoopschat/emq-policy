@@ -30,7 +30,7 @@
 
 -export([load/1, unload/0]).
 
--import(emq_policy_server_base_app, [parser_app_by_client/1, validate_client_format/2]).
+-import(emq_policy_server_base_app, [parser_app_by_client/1, validate_client_account/2]).
 
 %% hooks
 -export([on_client_connected/3, on_client_disconnected/3]).
@@ -44,7 +44,7 @@ unload() ->
 
 %% on client connected
 on_client_connected(_ConnAck, Client = #mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, _Env) ->
-  IsClient = validate_client_format(ClientId, Username),
+  IsClient = validate_client_account(ClientId, Username),
   if
     IsClient ->
       handle_connect_subscribe(ClientId, ClientPid, Username),

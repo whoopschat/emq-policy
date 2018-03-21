@@ -28,7 +28,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_base_app, [parser_app_by_client/1, parser_device_by_client/1, validate_client_format/2]).
+-import(emq_policy_server_base_app, [parser_app_by_client/1, parser_device_by_client/1, validate_client_account/2]).
 -import(emq_policy_server_base_http, [request/3, env_http_request/0]).
 
 -export([load/1, unload/0]).

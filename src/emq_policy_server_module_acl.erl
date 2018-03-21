@@ -22,29 +22,23 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_app).
+-module(emq_policy_server_module_acl).
 
--behaviour(application).
+-behaviour(emqttd_acl_mod).
 
-%% Application callbacks
--export([start/2, stop/1]).
+%% include
+-include("emq_policy_server.hrl").
+-include_lib("emqttd/include/emqttd.hrl").
 
-start(_StartType, _StartArgs) ->
-  reg_auth(),
-  reg_acl(),
-  {ok, Sup} = emq_policy_server_app_super:start_link(),
-  emq_policy_server_module_connect:load(application:get_all_env()),
-  emq_policy_server_module_hook:load(application:get_all_env()),
-  {ok, Sup}.
+%% Callbacks
+-export([init/1, check_acl/2, reload_acl/1, description/0]).
 
-stop(_State) ->
-  emq_policy_server_module_connect:unload(),
-  emq_policy_server_module_hook:unload().
+init(Env) ->
+  {ok, Env}.
 
-reg_auth() ->
-  emqttd_access_control:register_mod(auth, emq_policy_server_module_auth, undefined),
-  ok.
+check_acl({_Client, _PubSub, _Topic}, _Env) ->
+  deny.
 
-reg_acl() ->
-  emqttd_access_control:register_mod(acl, emq_policy_server_module_acl, undefined),
-  ok.
+reload_acl(_State) -> ok.
+
+description() -> "Emq Policy Server ACL module".

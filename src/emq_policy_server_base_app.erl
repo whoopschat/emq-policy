@@ -27,7 +27,7 @@
 %% include
 -include_lib("emqttd/include/emqttd.hrl").
 
--export([parser_app_by_client/1, parser_device_by_client/1, validate_system_format/2, validate_client_format/2]).
+-export([parser_app_by_client/1, parser_device_by_client/1, validate_system_account/2, validate_client_account/2]).
 
 %%　client : $client/{$app_id}/{$device}/{$username}/
 parser_app_by_client(ClientId) ->
@@ -53,7 +53,7 @@ parser_device_by_client(ClientId) ->
   end.
 
 %%　validate client format
-validate_client_format(ClientId, Username) ->
+validate_client_account(ClientId, Username) ->
   ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
   Len = erlang:length(ClientSplit),
   if
@@ -63,7 +63,7 @@ validate_client_format(ClientId, Username) ->
       false
   end.
 
-validate_system_format(ClientId, Username) ->
+validate_system_account(ClientId, Username) ->
   ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
   Len = erlang:length(ClientSplit),
   if

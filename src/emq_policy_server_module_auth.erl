@@ -22,28 +22,38 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_app_acl).
+-module(emq_policy_server_module_auth).
 
--behaviour(emqttd_acl_mod).
+-behaviour(emqttd_auth_mod).
 
 %% include
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
-%% Callbacks
--export([init/1, check_acl/2, reload_acl/1, description/0]).
+-import(emq_policy_server_base_app, [parser_app_by_client/1, parser_device_by_client/1, validate_system_account/2, validate_client_account/2]).
+-import(emq_policy_server_base_binary, [trimBOM/1]).
+-import(emq_policy_server_base_http, [request/3, env_http_request/0]).
 
+-define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
+
+%% Callbacks
+-export([init/1, check/3, description/0]).
 
 init(Env) ->
   {ok, Env}.
 
-check_acl({_Client, _PubSub, _Topic}, _Env) ->
-%%  Access = access(PubSub),
-  deny.
+check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
+  {error, username_or_password_undefined};
+check(Client = #mqtt_client{username = Username, client_id = ClientId}, Password, _Env) ->
+  IsClient = validate_client_account(ClientId, Username),
+  IsSystem = validate_system_account(ClientId, Username),
+  if
+    IsClient ->
+      {ok, false};
+    IsSystem ->
+      {ok, false};
+    true ->
+      {error, "ClientId format error"}
+  end.
 
-reload_acl(_State) -> ok.
-
-%%access(subscribe) -> 1;
-%%access(publish) -> 2.
-
-description() -> "Emq Policy Server ACL module".
+description() -> "Emq Policy Server AUTH module".
