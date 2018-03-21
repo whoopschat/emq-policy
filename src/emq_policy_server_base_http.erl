@@ -42,11 +42,17 @@ env_http_request() ->
 
 request(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
-  httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
+  Timeout = 3000,
+  httpc:request(get, Req, [{autoredirect, true}], [{timeout, Timeout}, {connect_timeout, Timeout}, {sync, false}]),
   ok;
 request(post, Url, Params) ->
+  io:format("post start : ~s~n", [Url]),
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
-  httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
+  Timeout = 3000,
+  {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{timeout, Timeout}, {connect_timeout, Timeout}, {sync, false}]),
+  receive {http, {RequestId, Result}} ->
+    io:format("post : ~s~n", [Result]), Result after 500 -> error end,
+  io:format("post return : ~s~n", [Url]),
   ok.
 
 
