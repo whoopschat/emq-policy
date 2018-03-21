@@ -26,12 +26,8 @@
 %% API
 %%%---------------------------------------------------
 
-{mapping, "emq_policy_server.api", "emq_policy_server.api", [
-  {default, undefined},
-  {datatype, string}
-]}.
-
 {mapping, "emq_policy_server.api.url", "emq_policy_server.api", [
+  {default, undefined},
   {datatype, string}
 ]}.
 
@@ -45,10 +41,7 @@
 ]}.
 
 {translation, "emq_policy_server.api", fun(Conf) ->
-  case cuttlefish:conf_get("emq_policy_server.api", Conf, undefined) of
-    undefined -> cuttlefish:unset();
-    Url -> [{url, cuttlefish:conf_get("emq_policy_server.api.url", Conf)},
-            {method, cuttlefish:conf_get("emq_policy_server.api.method", Conf)},
-            {server_key, cuttlefish:conf_get("emq_policy_server.api.server_key", Conf)}]
-  end
+  [{url, cuttlefish:conf_get("emq_policy_server.api.url", Conf)},
+  {method, cuttlefish:conf_get("emq_policy_server.api.method", Conf)},
+  {server_key, cuttlefish:conf_get("emq_policy_server.api.server_key", Conf)}]
 end}.
