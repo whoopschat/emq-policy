@@ -48,8 +48,7 @@ check(#mqtt_client{username = Username, client_id = ClientId}, Password, _Env) -
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
-      request_auth_hook(ClientId, Username, Password, auth, env_http_request()),
-      {ok, false};
+      request_auth_hook(ClientId, Username, Password, auth, env_http_request());
     true ->
       {error, "ClientId Format Error"}
   end.
