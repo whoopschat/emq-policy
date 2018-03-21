@@ -76,8 +76,7 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
       IsJson ->
         handleAuthResult(Json);
       true ->
-        io:format("auth system log[error]:~nauth return json format error~n=====================================================~n"),
-        {error, "Auth Return Json Format Rrror"}
+        {error, "Auth Json Format Rrror"}
     end;
     {ok, Code, _Body} ->
       {error, Code};
