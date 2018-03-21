@@ -48,7 +48,7 @@ request(get, Url, Params) ->
   receive {http, {RequestId, Result}} ->
     io:format("get success"),
     ok
-  after 500 ->
+  after Timeout ->
     error
   end,
   io:format("get return : ~s~n", [Url]),
@@ -61,7 +61,7 @@ request(post, Url, Params) ->
   receive {http, {RequestId, Result}} ->
     io:format("post success"),
     ok
-  after 500 ->
+  after Timeout ->
     error
   end,
   io:format("post return : ~s~n", [Url]),
