@@ -27,10 +27,10 @@
 %% include
 -include_lib("emqttd/include/emqttd.hrl").
 
--export([parser_app_by_client/1, parser_device_by_client/1, validate_system_account/2, validate_client_account/2]).
+-export([parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
 
 %%　client : $client/{$app_id}/{$device}/{$username}/
-parser_app_by_client(ClientId) ->
+parser_app_by_clientId(ClientId) ->
   ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
   Len = erlang:length(ClientSplit),
   if
@@ -40,9 +40,8 @@ parser_app_by_client(ClientId) ->
       ""
   end.
 
-
 %%　client : $client/{$app_id}/{$device}/{$username}/
-parser_device_by_client(ClientId) ->
+parser_device_by_clientId(ClientId) ->
   ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
   Len = erlang:length(ClientSplit),
   if
@@ -52,23 +51,13 @@ parser_device_by_client(ClientId) ->
       ""
   end.
 
-%%　validate client format
-validate_client_account(ClientId, Username) ->
+%%　validate clientId format
+validate_clientId(ClientId, Username) ->
   ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
   Len = erlang:length(ClientSplit),
   if
     Len >= 4 ->
       string:equal(binary_to_list(ClientId), "$client/" ++ lists:nth(2, ClientSplit) ++ "/" ++ lists:nth(3, ClientSplit) ++ "/" ++ binary_to_list(Username) ++ "/");
-    true ->
-      false
-  end.
-
-validate_system_account(ClientId, Username) ->
-  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
-  Len = erlang:length(ClientSplit),
-  if
-    Len >= 2 ->
-      string:equal(binary_to_list(ClientId), "$system/" ++ binary_to_list(Username) ++ "/");
     true ->
       false
   end.

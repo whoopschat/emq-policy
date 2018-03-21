@@ -28,7 +28,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_base_app, [parser_app_by_client/1, parser_device_by_client/1, validate_client_account/2]).
+-import(emq_policy_server_base_app, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
 -import(emq_policy_server_base_http, [request/3, env_http_request/0]).
 
 -export([load/1, unload/0]).
@@ -55,15 +55,32 @@ unload() ->
 %%--------------------------------------------------------------------
 
 %% hook client connected
-hook_client_connected(ConnAck, Client = #mqtt_client{client_id = ClientId}, _Env) ->
+hook_client_connected(ConnAck, Client = #mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, _Env) ->
   io:format("hook log (client.connected):~nclient ~s connected, connack: ~w~n=====================================================~n", [ClientId, ConnAck]),
   request_connect_hook(Client, client_connected, env_http_request()),
+  IsClient = validate_clientId(ClientId, Username),
+  if
+    IsClient ->
+      handle_connect_subscribe(ClientId, ClientPid, Username),
+      true;
+    true ->
+      false
+  end,
   {ok, Client}.
 
 %% hook client connected
 hook_client_disconnected(Reason, Client = #mqtt_client{client_id = ClientId}, _Env) ->
   io:format("hook log (client.disconnected):~nclient ~s disconnected, reason: ~w~n=====================================================~n", [ClientId, Reason]),
   request_connect_hook(Client, client_disconnected, env_http_request()),
+  ok.
+
+%% handle connect subscribe
+handle_connect_subscribe(_ClientId, _ClientPid, undefined) -> ok;
+handle_connect_subscribe(ClientId, ClientPid, Username) ->
+  PrivateTopic = list_to_binary("$private/" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
+  CommandTopic = list_to_binary("$command/" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
+  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
+  ClientPid ! {subscribe, TopicTable},
   ok.
 
 %%--------------------------------------------------------------------
