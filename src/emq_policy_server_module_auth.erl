@@ -94,6 +94,8 @@ handleAuthResult(Json) ->
   case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
     ok
   end,
-  {validate_boolean(IsUser), validate_boolean(IsSuper)}.
+  IsUserFlag = validate_boolean(IsUser),
+  IsSuperFlag = validate_boolean(IsSuper),
+  {if IsUserFlag -> ok; true -> error end, IsSuperFlag}.
 
 description() -> "Emq Policy Server AUTH module".
