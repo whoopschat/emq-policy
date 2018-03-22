@@ -90,7 +90,7 @@ hook_message_delivered(ClientId, Username, Message = #mqtt_message{topic = Topic
 %% hook message ask
 hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   io:format("hook log (message.acked):~nclient(~s/~s) acked: ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
-  request_message_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
+  request_message_ask_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
   {ok, Message}.
 
 %%--------------------------------------------------------------------
@@ -98,7 +98,7 @@ hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payl
 %%--------------------------------------------------------------------
 
 request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
-  Mod = hook,
+  Mod = connect,
   Params = [
     {server_key, ServerKey}
     , {app_id, parser_app_by_clientId(ClientId)}
@@ -110,7 +110,21 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
   request(Method, Url, Params).
 
 request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
-  Mod = hook,
+  Mod = message,
+  Params = [
+    {server_key, ServerKey}
+    , {app_id, parser_app_by_clientId(ClientId)}
+    , {module, Mod}
+    , {action, Action}
+    , {client_id, ClientId}
+    , {username, Username}
+    , {topic, Topic}
+    , {payload, Payload}
+  ],
+  request(Method, Url, Params).
+
+request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+  Mod = ask,
   Params = [
     {server_key, ServerKey}
     , {app_id, parser_app_by_clientId(ClientId)}
