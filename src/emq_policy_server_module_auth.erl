@@ -112,7 +112,7 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, _ClientId, _Username, SubList) ->
+handleAuthSub(ClientPid, _ClientId, _Username, SubList) when is_list(SubList) ->
   try
     TopicTable = [{S, 1} || S <- SubList],
     ClientPid ! {subscribe, TopicTable}
@@ -124,16 +124,14 @@ handleAuthSub(ClientPid, _ClientId, _Username, SubList) ->
     error:Reason ->
       Reason
   end,
+  ok;
+handleAuthSub(_, _, _, _) ->
   ok.
 
-handleAuthPub(ClientPid, ClientId, Username, _PubList) ->
-  publishMessage(ClientPid, ClientId, Username, <<"$abc/111/111/">>, <<"ni hao">>),
-  ok.
-
-publishMessage(_ClientPid, ClientId, _Username, Topic, Payload) ->
+handleAuthPub(_ClientPid, ClientId, _Username, PubList) when is_list(PubList) ->
   try
-    Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
-    emqttd:publish(Msg#mqtt_message{retain = false})
+    Msg = emqttd_message:make(ClientId, 1, <<"$abc/111/111/">>, <<"ni hao">>),
+    emqttd:publish(Msg#mqtt_message{retain = true})
   catch
     throw:Term ->
       Term;
@@ -142,6 +140,8 @@ publishMessage(_ClientPid, ClientId, _Username, Topic, Payload) ->
     error:Reason ->
       Reason
   end,
+  ok;
+handleAuthPub(_, _, _, _) ->
   ok.
 
 description() -> "Emq Policy Server AUTH module".
