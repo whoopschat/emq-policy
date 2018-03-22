@@ -127,16 +127,7 @@ handleAuthSub(ClientPid, SubList) ->
   ok.
 
 handleAuthPub(ClientId, _PubList) ->
-  try
-    publishMessage(ClientId, <<"$abc/111/111/">>, <<"ni hao">>)
-  catch
-    throw:Term ->
-      Term;
-    exit:Reason ->
-      Reason;
-    error:Reason ->
-      Reason
-  end,
+  publishMessage(ClientId, "$abc/111/111/", "ni hao"),
   ok.
 
 publishMessage(ClientId, Topic, Payload) ->
