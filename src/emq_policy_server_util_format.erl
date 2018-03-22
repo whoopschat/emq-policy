@@ -100,7 +100,7 @@ replace_str(Str, Find, New) ->
     Len = string:len(Find),
     Index = string:str(Str, Find),
     First = string:substr(Str, 1, Index - 1),
-    End = string:substr(Str, Index + Len + 1, Total - Index - Len + 1),
+    End = string:substr(Str, Index + Len, Total - Index - Len + 1),
     string:concat(string:concat(First, New), End)
   catch
     throw:_Term ->
