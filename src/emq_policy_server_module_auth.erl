@@ -74,7 +74,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handleAuthResult(ClientPid, ClientId, Json);
+        handleAuthResult(ClientPid, ClientId, Username, Json);
       true ->
         {error, "Auth Failure"}
     end;
@@ -84,18 +84,18 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
       {error, Error}
   end.
 
-handleAuthResult(ClientPid, ClientId, Json) ->
+handleAuthResult(ClientPid, ClientId, Username, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
     IsUserFlag = validate_boolean(IsUser),
     if IsUserFlag ->
       case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-        handleAuthSub(ClientPid, ClientId, SubList);
+        handleAuthSub(ClientPid, ClientId, Username, SubList);
         _ ->
           true
       end,
       case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(ClientPid, ClientId, PubList);
+        handleAuthPub(ClientPid, ClientId, Username, PubList);
         _ ->
           true
       end,
@@ -112,7 +112,7 @@ handleAuthResult(ClientPid, ClientId, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, _ClientId, SubList) ->
+handleAuthSub(ClientPid, _ClientId, _Username, SubList) ->
   try
     TopicTable = [{S, 1} || S <- SubList],
     ClientPid ! {subscribe, TopicTable}
@@ -126,12 +126,12 @@ handleAuthSub(ClientPid, _ClientId, SubList) ->
   end,
   ok.
 
-handleAuthPub(_ClientPid, ClientId, _PubList) ->
-  publishMessage(ClientId, <<"$abc/111/111/">>, <<"ni hao">>),
+handleAuthPub(_ClientPid, ClientId, Username, _PubList) ->
+  publishMessage(ClientId, Username, <<"$abc/111/111/">>, <<"ni hao">>),
   ok.
 
-publishMessage(ClientId, Topic, Payload) ->
-  Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
+publishMessage(ClientId, Username, Topic, Payload) ->
+  Msg = emqttd_message:make({client_id = ClientId, username = Username}, 1, Topic, Payload),
   emqttd:publish(Msg#mqtt_message{retain = false}).
 
 description() -> "Emq Policy Server AUTH module".

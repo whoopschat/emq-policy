@@ -71,11 +71,19 @@ hook_client_disconnected(Reason, Client = #mqtt_client{client_id = ClientId}, _E
 %% Message Hook
 %%--------------------------------------------------------------------
 
+%% transform message and return
+hook_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _Env) ->
+  {ok, Message};
+
 hook_message_publish(Message = #mqtt_message{topic = Topic, payload = Payload, from = {ClientId, Username}}, _Env) ->
   io:format("hook log (message.publish):~npublish ~s~n=====================================================~n", [emqttd_message:format(Message)]),
   request_message_hook(Topic, Payload, ClientId, Username, message_publish, env_http_request()),
+  {ok, Message};
+
+hook_message_publish(Message, _Env) ->
   {ok, Message}.
 
+%% hook message delivered
 hook_message_delivered(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   io:format("hook log (message.delivered):~ndelivered to client(~s/~s): ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
   request_message_hook(Topic, Payload, ClientId, Username, message_delivered, env_http_request()),
