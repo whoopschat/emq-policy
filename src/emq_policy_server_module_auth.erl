@@ -35,7 +35,6 @@
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 
 -define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
--define(UN_LIST(S), (S =:= [])).
 
 %% Callbacks
 -export([init/1, check/3, description/0]).
@@ -113,18 +112,32 @@ handleAuthResult(ClientPid, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(_, List) when ?UN_LIST(List) ->
-  ok;
 handleAuthSub(ClientPid, SubList) ->
-  TopicTable = [{S, 1} || S <- SubList],
-  ClientPid ! {subscribe, TopicTable},
+  try
+    TopicTable = [{S, 1} || S <- SubList],
+    ClientPid ! {subscribe, TopicTable}
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
   ok.
 
-handleAuthPub(_, List) when ?UN_LIST(List) ->
-  ok;
 handleAuthPub(ClientPid, PubList) ->
-  TopicTable = [{S, 1} || S <- PubList],
-  ClientPid ! {publish, TopicTable},
+  try
+    TopicTable = [{S, 1} || S <- PubList],
+    ClientPid ! {subscribe, TopicTable}
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
   ok.
 
 description() -> "Emq Policy Server AUTH module".
