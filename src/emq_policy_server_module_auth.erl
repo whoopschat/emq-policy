@@ -84,11 +84,13 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
       {error, Error}
   end.
 
-handleAuthResult(_Json) ->
-%%  BodyObj = jsx:decode(Json),
-%%  {_, Code} = lists:keyfind(<<"code">>, 1, BodyObj),
-%%  {_, Msg} = lists:keyfind(<<"msg">>, 1, BodyObj),
-%%  io:format("auth system log[error]:~nauth return json format error~n=====================================================~n"),
-  {ok, false}.
+handleAuthResult(Json) ->
+  JSONBody = jsx:decode(Json),
+  {_, IsUser} = lists:keyfind(<<"is_user">>, 1, JSONBody),
+  {_, IsSuper} = lists:keyfind(<<"is_super">>, 1, JSONBody),
+  {_, SubList} = lists:keyfind(<<"sub_list">>, 1, JSONBody),
+  {_, PubList} = lists:keyfind(<<"pub_list">>, 1, JSONBody),
+  {if IsUser == 1 -> ok;else -> error end,
+    if IsSuper == 1 -> true;else -> false end}.
 
 description() -> "Emq Policy Server AUTH module".
