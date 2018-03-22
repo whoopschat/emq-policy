@@ -127,7 +127,7 @@ handleAuthSub(ClientPid, SubList) ->
   ok.
 
 handleAuthPub(ClientId, _PubList) ->
-  publishMessage(ClientId, "$abc/111/111/", "ni hao"),
+  publishMessage(ClientId, <<"$abc/111/111/">>, <<"ni hao">>),
   ok.
 
 publishMessage(ClientId, Topic, Payload) ->
