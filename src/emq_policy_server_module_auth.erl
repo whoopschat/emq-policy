@@ -131,7 +131,7 @@ handleAuthPub(ClientPid, ClientId, Username, _PubList) ->
   ok.
 
 publishMessage(_ClientPid, ClientId, Username, Topic, Payload) ->
-  Msg = emqttd_message:make(list_to_binary(Username ++ "/" ++ binary_to_list(ClientId)), 1, Topic, Payload),
+  Msg = emqttd_message:make(list_to_binary(binary_to_list(Username) ++ "/" ++ binary_to_list(ClientId)), 1, Topic, Payload),
   emqttd:publish(Msg#mqtt_message{retain = false}).
 
 description() -> "Emq Policy Server AUTH module".
