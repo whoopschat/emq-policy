@@ -64,12 +64,12 @@ validate_clientId(ClientId, Username) ->
 
 validate_boolean(1) ->
   true;
-validate_boolean("1") ->
+validate_boolean(<<"1">>) ->
   true;
-validate_boolean("true") ->
+validate_boolean(<<"true">>) ->
   true;
 validate_boolean(true) ->
   true;
-validate_boolean(Value) ->
+validate_boolean(_Value) ->
   false.
 
