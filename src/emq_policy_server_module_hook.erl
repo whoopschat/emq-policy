@@ -86,6 +86,7 @@ hook_message_publish(Message = #mqtt_message{topic = Topic, payload = Payload, f
   {ok, Message};
 
 hook_message_publish(Message, _Env) ->
+  io:format("publish ~s~n=====================================================~n", [emqttd_message:format(Message)]),
   {ok, Message}.
 
 %% hook message delivered
