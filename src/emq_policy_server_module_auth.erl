@@ -112,9 +112,16 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, _ClientId, _Username, SubList) ->
-  TopicTable = [{S, 1} || S <- SubList],
+handleAuthSub(ClientPid, ClientId, Username, SubList) ->
+  List = lists:map(fun
+                     ({Sub, ":app_id"}) -> {Sub, parser_app_by_clientId(ClientId)};
+                     ({Sub, ":username"}) -> {Sub, Username};
+                     (Sub) -> Sub
+                   end, SubList),
+  TopicTable = [{S, 1} || S <- List],
   ClientPid ! {subscribe, TopicTable},
+  ok;
+handleAuthSub(_, _, _, _) ->
   ok.
 
 handleAuthPub(_ClientPid, _ClientId, _Username, _PubList) ->
