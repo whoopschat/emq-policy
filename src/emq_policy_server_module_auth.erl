@@ -90,12 +90,12 @@ handleAuthResult(ClientPid, ClientId, Json) ->
     IsUserFlag = validate_boolean(IsUser),
     if IsUserFlag ->
       case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-        handleAuthSub(ClientPid, SubList);
+        handleAuthSub(ClientPid, ClientId, SubList);
         _ ->
           true
       end,
       case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(ClientId, PubList);
+        handleAuthPub(ClientPid, ClientId, PubList);
         _ ->
           true
       end,
@@ -112,7 +112,7 @@ handleAuthResult(ClientPid, ClientId, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, SubList) ->
+handleAuthSub(ClientPid, _ClientId, SubList) ->
   try
     TopicTable = [{S, 1} || S <- SubList],
     ClientPid ! {subscribe, TopicTable}
@@ -126,12 +126,12 @@ handleAuthSub(ClientPid, SubList) ->
   end,
   ok.
 
-handleAuthPub(ClientId, _PubList) ->
-  publishMessage(ClientId, <<"$abc/111/111/">>, <<"ni hao">>),
+handleAuthPub(ClientPid, ClientId, _PubList) ->
+  publishMessage(ClientPid, ClientId, <<"$abc/111/111/">>, <<"ni hao">>),
   ok.
 
-publishMessage(ClientId, Topic, Payload) ->
+publishMessage(ClientPid, ClientId, Topic, Payload) ->
   Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
-  emqttd:publish(Msg#mqtt_message{retain = false}).
+  ClientPid ! {publish, Msg#mqtt_message{retain = false}}.
 
 description() -> "Emq Policy Server AUTH module".
