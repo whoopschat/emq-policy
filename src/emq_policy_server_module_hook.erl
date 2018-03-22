@@ -28,7 +28,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
+-import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_clientId/2]).
 -import(emq_policy_server_util_http, [request/3, env_http_request/0]).
 
 -export([load/1, unload/0]).
@@ -78,6 +78,11 @@ hook_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _En
 hook_message_publish(Message = #mqtt_message{topic = Topic, payload = Payload, from = {ClientId, Username}}, _Env) ->
   io:format("hook log (message.publish):~npublish ~s~n=====================================================~n", [emqttd_message:format(Message)]),
   request_message_hook(Topic, Payload, ClientId, Username, message_publish, env_http_request()),
+  {ok, Message};
+
+hook_message_publish(Message = #mqtt_message{topic = Topic, payload = Payload, from = ClientId}, _Env) ->
+  io:format("hook log (message.publish):~npublish ~s~n=====================================================~n", [emqttd_message:format(Message)]),
+  request_message_hook(Topic, Payload, ClientId, parser_username_by_clientId(ClientId), message_publish, env_http_request()),
   {ok, Message};
 
 hook_message_publish(Message, _Env) ->
