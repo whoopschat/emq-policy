@@ -131,12 +131,7 @@ handleAuthPub(ClientId, _PubList) ->
   ok.
 
 publishMessage(ClientId, Topic, Payload) ->
-  case emqttd_mgmt:publish({ClientId, Topic, Payload, 1, false}) of
-    ok ->
-      ok;
-    {error, _Error} ->
-      error
-  end.
-
+  Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
+  emqttd:publish(Msg#mqtt_message{retain = false}).
 
 description() -> "Emq Policy Server AUTH module".
