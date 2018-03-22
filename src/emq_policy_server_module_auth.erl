@@ -112,11 +112,10 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, ClientId, Username, _SubList) ->
-%%  PrivateTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
-%%  CommandTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/command/+/" ++ binary_to_list(Username) ++ "/"),
-%%  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
-%%  ClientPid ! {subscribe, TopicTable},
+handleAuthSub(ClientPid, _ClientId, _Username, SubList) ->
+  Subs = tuple_to_list(SubList),
+  TopicTable = [{S, 1} || S <- Subs],
+  ClientPid ! {subscribe, TopicTable},
   ok.
 
 handleAuthPub(_ClientPid, _ClientId, _Username, _PubList) ->
