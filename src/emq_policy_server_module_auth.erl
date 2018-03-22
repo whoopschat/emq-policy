@@ -113,21 +113,13 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
   end.
 
 handleAuthSub(ClientPid, ClientId, Username, _SubList) ->
-  PrivateTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
-  CommandTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/command/+/" ++ binary_to_list(Username) ++ "/"),
-  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
-  ClientPid ! {subscribe, TopicTable},
+%%  PrivateTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
+%%  CommandTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/command/+/" ++ binary_to_list(Username) ++ "/"),
+%%  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
+%%  ClientPid ! {subscribe, TopicTable},
   ok.
 
 handleAuthPub(_ClientPid, _ClientId, _Username, _PubList) ->
   ok.
 
-%% handle connect subscribe
-handle_connect_subscribe(_ClientId, _ClientPid, undefined) -> ok;
-handle_connect_subscribe(ClientId, ClientPid, Username) ->
-  PrivateTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
-  CommandTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/command/+/" ++ binary_to_list(Username) ++ "/"),
-  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
-  ClientPid ! {subscribe, TopicTable},
-  ok.
 description() -> "Emq Policy Server AUTH module".
