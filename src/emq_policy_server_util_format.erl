@@ -98,7 +98,7 @@ replace_str(Str, Find, New) ->
   try
     Index = string:str(Str, Find),
     Len = string:len(Find),
-    First = string:substr(Str, 1, Index),
+    First = string:substr(Str, 0, Len),
     End = string:substr(Str, Index + Len, string:len(Str) - Index - Len),
     string:concat(string:concat(First, New), End)
   catch
