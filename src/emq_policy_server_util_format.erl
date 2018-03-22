@@ -96,10 +96,11 @@ a2b(A) -> atom_to_binary(A, utf8).
 
 replace_str(Str, Find, New) ->
   try
+    Total = string:len(Str),
     Index = string:str(Str, Find),
     Len = string:len(Find),
-    First = string:substr(Str, 0, Len),
-    End = string:substr(Str, Index + Len, string:len(Str) - Index - Len),
+    First = string:substr(Str, 1, Len),
+    End = string:substr(Str, Index + Len, Total - Index - Len),
     string:concat(string:concat(First, New), End)
   catch
     throw:_Term ->
