@@ -114,9 +114,8 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
 
 handleAuthSub(ClientPid, ClientId, Username, SubList) ->
   List = lists:map(fun
-                     ({Sub, ":app_id"}) -> {Sub, parser_app_by_clientId(ClientId)};
-                     ({Sub, ":username"}) -> {Sub, Username};
-                     (Sub) -> Sub
+                     (Sub) -> binary:replace(Sub, <<":app_id">>, list_to_binary(parser_app_by_clientId(ClientId)), [global]);
+                     (Sub) -> binary:replace(Sub, <<":username">>, list_to_binary(Username), [global])
                    end, SubList),
   TopicTable = [{S, 1} || S <- List],
   ClientPid ! {subscribe, TopicTable},
