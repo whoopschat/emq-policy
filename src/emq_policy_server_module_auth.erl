@@ -126,12 +126,12 @@ handleAuthSub(ClientPid, _ClientId, SubList) ->
   end,
   ok.
 
-handleAuthPub(ClientPid, ClientId, _PubList) ->
-  publishMessage(ClientPid, ClientId, <<"$abc/111/111/">>, <<"ni hao">>),
+handleAuthPub(_ClientPid, ClientId, _PubList) ->
+  publishMessage(ClientId, <<"$abc/111/111/">>, <<"ni hao">>),
   ok.
 
-publishMessage(ClientPid, ClientId, Topic, Payload) ->
+publishMessage(ClientId, Topic, Payload) ->
   Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
-  ClientPid ! {publish, Msg#mqtt_message{retain = false}}.
+  emqttd:publish(Msg#mqtt_message{retain = false}).
 
 description() -> "Emq Policy Server AUTH module".
