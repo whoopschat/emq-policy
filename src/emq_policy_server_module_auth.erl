@@ -89,18 +89,22 @@ handleAuthResult(Json) ->
   case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
     IsUserFlag = validate_boolean(IsUser),
     if IsUserFlag ->
-      IsSuperFlag = false,
-      case lists:keyfind(<<"is_super">>, 1, JSONBody) of {_, IsSuper} ->
-        IsSuperFlag = validate_boolean(IsSuper),
-        ok
-      end,
       case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-        handleAuthSub(SubList)
+        handleAuthSub(SubList);
+        _ ->
+          true
       end,
       case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(PubList)
+        handleAuthPub(PubList);
+        _ ->
+          true
       end,
-      {ok, IsSuperFlag};
+      case lists:keyfind(<<"is_super">>, 1, JSONBody) of {_, IsSuper} ->
+        IsSuperFlag = validate_boolean(IsSuper),
+        {ok, IsSuperFlag};
+        _ ->
+          {ok, false}
+      end;
       true ->
         {error, "Auth Failure"},
         {error, false}
