@@ -76,7 +76,7 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
       IsJson ->
         handleAuthResult(Json);
       true ->
-        {error, "Auth Json Format Rrror"}
+        {error, "Auth Failure"}
     end;
     {ok, Code, _Body} ->
       {error, Code};
@@ -106,9 +106,10 @@ handleAuthResult(Json) ->
           {ok, false}
       end;
       true ->
-        {error, "Auth Failure"},
-        {error, false}
-    end
+        {error, "Auth Failure"}
+    end;
+    _ ->
+      {error, "Auth Failure"}
   end.
 
 handleAuthSub(_SubList) ->
