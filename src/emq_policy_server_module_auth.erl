@@ -130,8 +130,18 @@ handleAuthPub(ClientPid, ClientId, Username, _PubList) ->
   publishMessage(ClientPid, ClientId, Username, <<"$abc/111/111/">>, <<"ni hao">>),
   ok.
 
-publishMessage(_ClientPid, ClientId, Username, Topic, Payload) ->
-  Msg = emqttd_message:make(list_to_binary(binary_to_list(Username) ++ "/" ++ binary_to_list(ClientId)), 1, Topic, Payload),
-  emqttd:publish(Msg#mqtt_message{retain = false}).
+publishMessage(_ClientPid, ClientId, _Username, Topic, Payload) ->
+  try
+    Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
+    emqttd:publish(Msg#mqtt_message{retain = false})
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
+  ok.
 
 description() -> "Emq Policy Server AUTH module".
