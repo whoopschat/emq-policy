@@ -74,7 +74,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handleAuthResult(ClientPid, ClientId, Username, Json);
+        handleAuthResult(ClientPid, Json);
       true ->
         {error, "Auth Failure"}
     end;
@@ -84,18 +84,18 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
       {error, Error}
   end.
 
-handleAuthResult(ClientPid, ClientId, Username, Json) ->
+handleAuthResult(ClientPid, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
     IsUserFlag = validate_boolean(IsUser),
     if IsUserFlag ->
       case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-        handleAuthSub(ClientPid, ClientId, Username, SubList);
+        handleAuthSub(ClientPid, SubList);
         _ ->
           true
       end,
       case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(ClientPid, ClientId, Username, PubList);
+        handleAuthPub(ClientPid, PubList);
         _ ->
           true
       end,
@@ -112,19 +112,18 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, ClientId, Username, SubList) ->
-  List = lists:map(fun
-                     (Sub) ->
-                       binary:replace(Sub, <<":app_id">>, list_to_binary(parser_app_by_clientId(ClientId)), [global]);
-                     (Sub) -> binary:replace(Sub, <<":username">>, Username, [global])
-                   end, SubList),
-  TopicTable = [{S, 1} || S <- List],
+handleAuthSub(ClientPid, SubList) ->
+  TopicTable = [{S, 1} || S <- SubList],
   ClientPid ! {subscribe, TopicTable},
   ok;
-handleAuthSub(_, _, _, _) ->
+handleAuthSub(_, _) ->
   ok.
 
-handleAuthPub(_ClientPid, _ClientId, _Username, _PubList) ->
+handleAuthPub(ClientPid, PubList) ->
+  TopicTable = [{S, 1} || S <- PubList],
+  ClientPid ! {publish, TopicTable},
+  ok;
+handleAuthPub(_, _) ->
   ok.
 
 description() -> "Emq Policy Server AUTH module".
