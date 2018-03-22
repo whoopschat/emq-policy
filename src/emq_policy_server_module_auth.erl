@@ -128,7 +128,7 @@ handleAuthSub(ClientPid, SubList) ->
 
 handleAuthPub(ClientPid, _PubList) ->
   try
-    ClientPid ! {publish, createMessage(<<"System">>, <<"SuperUser">>, <<"$abc/111/111/">>, <<"ni hao">>)}
+    ClientPid ! {publish, publishMessage(<<"System">>,  <<"$abc/111/111/">>, <<"ni hao">>)}
   catch
     throw:Term ->
       Term;
@@ -140,19 +140,13 @@ handleAuthPub(ClientPid, _PubList) ->
   ok.
 
 
-createMessage(ClientId, Username, Topic, Payload) ->
-  #mqtt_message{topic = Topic,
-    payload = Payload,
-    sys = false,
-    retain = false,
-    flags = [],
-    qos = 1,
-    id = <<"111111111111111111111111">>,
-    pktid = 111,
-    from = {ClientId, Username},
-    dup = false,
-    headers = [],
-    timestamp = erlang:now()}.
+publishMessage(ClientId,Topic, Payload) ->
+  case emqttd_mgmt:publish({ClientId, Topic, Payload, 1, false}) of
+    ok ->
+      ok;
+    {error, _Error} ->
+      error
+  end.
 
 
 description() -> "Emq Policy Server AUTH module".
