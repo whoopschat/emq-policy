@@ -113,8 +113,7 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
   end.
 
 handleAuthSub(ClientPid, _ClientId, _Username, SubList) ->
-  Subs = tuple_to_list(SubList),
-  TopicTable = [{S, 1} || S <- Subs],
+  TopicTable = [{S, 1} || S <- SubList],
   ClientPid ! {subscribe, TopicTable},
   ok.
 
