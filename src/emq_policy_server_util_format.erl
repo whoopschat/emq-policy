@@ -27,7 +27,7 @@
 %% include
 -include_lib("emqttd/include/emqttd.hrl").
 
--export([parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_boolean/1, validate_clientId/2, format_from/1]).
+-export([parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_boolean/1, validate_clientId/2, format_from/1,replace_str/3]).
 
 %%　client : $client/{$app_id}/{$device}/{$username}/
 parser_app_by_clientId(ClientId) ->
@@ -93,4 +93,12 @@ format_from(_) ->
   {<<>>, <<>>}.
 
 a2b(A) -> atom_to_binary(A, utf8).
+
+replace_str(Str, Find, New) when is_binary(Str);is_binary(Find);is_binary(New) ->
+  First = string:str(Str, Find),
+  Len = string:len(Find),
+  End = First + Len,
+  string:concat(string:concat(string:substr(Str, 1, Len), New), string:substr(Str, End, string:len(Str) - End));
+replace_str(Str, _Find, _New) ->
+  Str.
 

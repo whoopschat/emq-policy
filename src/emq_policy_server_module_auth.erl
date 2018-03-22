@@ -30,7 +30,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1, validate_boolean/1]).
+-import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1, validate_boolean/1, replace_str/3]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 
@@ -94,11 +94,6 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
         _ ->
           true
       end,
-      case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(ClientPid, ClientId, Username, PubList);
-        _ ->
-          true
-      end,
       case lists:keyfind(<<"is_super">>, 1, JSONBody) of {_, IsSuper} ->
         IsSuperFlag = validate_boolean(IsSuper),
         {ok, IsSuperFlag};
@@ -112,9 +107,9 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(ClientPid, _ClientId, _Username, SubList) when is_list(SubList) ->
+handleAuthSub(ClientPid, ClientId, Username, SubList) when is_list(SubList) ->
   try
-    TopicTable = [{S, 1} || S <- SubList],
+    TopicTable = [{replace_str(replace_str(S, ":username", list_to_binary(Username)), ":app_id", parser_app_by_clientId(ClientId)), 1} || S <- SubList],
     ClientPid ! {subscribe, TopicTable}
   catch
     throw:Term ->
@@ -128,20 +123,22 @@ handleAuthSub(ClientPid, _ClientId, _Username, SubList) when is_list(SubList) ->
 handleAuthSub(_, _, _, _) ->
   ok.
 
-handleAuthPub(_ClientPid, ClientId, _Username, PubList) when is_list(PubList) ->
-  try
-    Msg = emqttd_message:make(ClientId, 1, <<"$abc/111/111/">>, <<"ni hao">>),
-    emqttd:publish(Msg#mqtt_message{retain = true})
-  catch
-    throw:Term ->
-      Term;
-    exit:Reason ->
-      Reason;
-    error:Reason ->
-      Reason
-  end,
-  ok;
-handleAuthPub(_, _, _, _) ->
-  ok.
+%%handleAuthPub(_ClientPid, ClientId, _Username, PubList) when is_list(PubList) ->
+%%  try
+%%    lists:map(fun({Topic, Payload}) ->
+%%      Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
+%%      emqttd:publish(Msg#mqtt_message{retain = true}),
+%%      {Topic, Payload} end, PubList)
+%%  catch
+%%    throw:Term ->
+%%      Term;
+%%    exit:Reason ->
+%%      Reason;
+%%    error:Reason ->
+%%      Reason
+%%  end,
+%%  ok;
+%%handleAuthPub(_, _, _, _) ->
+%%  ok.
 
 description() -> "Emq Policy Server AUTH module".
