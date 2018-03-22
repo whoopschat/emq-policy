@@ -90,3 +90,5 @@ format_from(From) when is_atom(From) ->
 format_from(_) ->
   {<<>>, <<>>}.
 
+a2b(A) -> atom_to_binary(A, utf8).
+
