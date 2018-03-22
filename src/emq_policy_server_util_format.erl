@@ -87,6 +87,8 @@ format_from({ClientId, Username}) ->
   {ClientId, Username};
 format_from(From) when is_atom(From) ->
   {a2b(From), a2b(From)};
+format_from(From) when is_binary(From) ->
+  {From, parser_username_by_clientId(From)};
 format_from(_) ->
   {<<>>, <<>>}.
 
