@@ -109,7 +109,7 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
 
 handleAuthSub(ClientPid, ClientId, Username, SubList) when is_list(SubList) ->
   try
-    TopicTable = [{replace_str(replace_str(S, ":username", binary_to_list(Username)), ":app_id", parser_app_by_clientId(ClientId)), 1} || S <- SubList],
+    TopicTable = [{replace_str(replace_str(binary_to_list(S), ":username", binary_to_list(Username)), ":app_id", parser_app_by_clientId(ClientId)), 1} || S <- SubList],
     ClientPid ! {subscribe, TopicTable}
   catch
     throw:Term ->
