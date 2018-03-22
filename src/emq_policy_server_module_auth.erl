@@ -142,6 +142,7 @@ handleAuthPub(ClientPid, _PubList) ->
 
 createMessage(ClientId, Username, Topic, Payload) ->
   #mqtt_message{topic = Topic,
+    payload = Payload,
     sys = false,
     retain = false,
     flags = [],
@@ -151,7 +152,7 @@ createMessage(ClientId, Username, Topic, Payload) ->
     from = {ClientId, Username},
     dup = false,
     headers = [],
-    payload = Payload}.
+    timestamp = erlang:now()}.
 
 
 description() -> "Emq Policy Server AUTH module".
