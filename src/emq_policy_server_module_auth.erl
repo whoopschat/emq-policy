@@ -126,10 +126,9 @@ handleAuthSub(ClientPid, SubList) ->
   end,
   ok.
 
-handleAuthPub(ClientPid, PubList) ->
+handleAuthPub(ClientPid, _PubList) ->
   try
-    TopicTable = [{S, 1} || S <- PubList],
-    ClientPid ! {subscribe, TopicTable}
+    ClientPid ! {publish, #mqtt_message{topic = <<"$abc/111/111/">>, payload = <<"nihao">>}}
   catch
     throw:Term ->
       Term;
