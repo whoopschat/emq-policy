@@ -74,7 +74,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handleAuthResult(ClientPid, Json);
+        handleAuthResult(ClientPid, ClientId, Json);
       true ->
         {error, "Auth Failure"}
     end;
@@ -84,7 +84,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
       {error, Error}
   end.
 
-handleAuthResult(ClientPid, Json) ->
+handleAuthResult(ClientPid, ClientId, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
     IsUserFlag = validate_boolean(IsUser),
@@ -95,7 +95,7 @@ handleAuthResult(ClientPid, Json) ->
           true
       end,
       case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(ClientPid, PubList);
+        handleAuthPub(ClientId, PubList);
         _ ->
           true
       end,
@@ -126,9 +126,9 @@ handleAuthSub(ClientPid, SubList) ->
   end,
   ok.
 
-handleAuthPub(ClientPid, _PubList) ->
+handleAuthPub(ClientId, _PubList) ->
   try
-    ClientPid ! {publish, publishMessage(<<"System">>,  <<"$abc/111/111/">>, <<"ni hao">>)}
+    publishMessage(ClientId, <<"$abc/111/111/">>, <<"ni hao">>)
   catch
     throw:Term ->
       Term;
@@ -139,8 +139,7 @@ handleAuthPub(ClientPid, _PubList) ->
   end,
   ok.
 
-
-publishMessage(ClientId,Topic, Payload) ->
+publishMessage(ClientId, Topic, Payload) ->
   case emqttd_mgmt:publish({ClientId, Topic, Payload, 1, false}) of
     ok ->
       ok;
