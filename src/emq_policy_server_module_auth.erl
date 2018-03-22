@@ -30,7 +30,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1]).
+-import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1, validate_boolean/1]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 
@@ -88,9 +88,12 @@ handleAuthResult(Json) ->
   JSONBody = jsx:decode(Json),
   {_, IsUser} = lists:keyfind(<<"is_user">>, 1, JSONBody),
   {_, IsSuper} = lists:keyfind(<<"is_super">>, 1, JSONBody),
-  {_, SubList} = lists:keyfind(<<"sub_list">>, 1, JSONBody),
-  {_, PubList} = lists:keyfind(<<"pub_list">>, 1, JSONBody),
-  {if IsUser == 1 -> ok;else -> error end,
-    if IsSuper == 1 -> true;else -> false end}.
+  case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
+    ok
+  end,
+  case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
+    ok
+  end,
+  {validate_boolean(IsUser), validate_boolean(IsSuper)}.
 
 description() -> "Emq Policy Server AUTH module".

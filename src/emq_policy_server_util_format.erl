@@ -27,7 +27,7 @@
 %% include
 -include_lib("emqttd/include/emqttd.hrl").
 
--export([parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
+-export([parser_app_by_clientId/1, parser_device_by_clientId/1, validate_boolean/1, validate_clientId/2]).
 
 %%　client : $client/{$app_id}/{$device}/{$username}/
 parser_app_by_clientId(ClientId) ->
@@ -62,4 +62,14 @@ validate_clientId(ClientId, Username) ->
       false
   end.
 
+validate_boolean(1) ->
+  true;
+validate_boolean("1") ->
+  true;
+validate_boolean("true") ->
+  true;
+validate_boolean(true) ->
+  true;
+validate_boolean(Value) ->
+  false.
 
