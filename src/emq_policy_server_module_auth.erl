@@ -44,11 +44,11 @@ init(Env) ->
 
 check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
   {error, username_or_password_undefined};
-check(#mqtt_client{username = Username, client_id = ClientId}, Password, _Env) ->
+check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
-      request_auth_hook(ClientId, Username, Password, user_auth, env_http_request());
+      request_auth_hook(ClientPid, ClientId, Username, Password, user_auth, env_http_request());
     true ->
       {error, "ClientId Format Error"}
   end.
@@ -58,7 +58,7 @@ check(#mqtt_client{username = Username, client_id = ClientId}, Password, _Env) -
 %% Request Hook
 %%--------------------------------------------------------------------
 
-request_auth_hook(ClientId, Username, Password, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = auth,
   Params = [
     {server_key, ServerKey}
@@ -74,7 +74,7 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handleAuthResult(Json);
+        handleAuthResult(ClientPid, ClientId, Username, Json);
       true ->
         {error, "Auth Failure"}
     end;
@@ -84,18 +84,18 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
       {error, Error}
   end.
 
-handleAuthResult(Json) ->
+handleAuthResult(ClientPid, ClientId, Username, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
     IsUserFlag = validate_boolean(IsUser),
     if IsUserFlag ->
       case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-        handleAuthSub(SubList);
+        handleAuthSub(ClientPid, ClientId, Username, SubList);
         _ ->
           true
       end,
       case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-        handleAuthPub(PubList);
+        handleAuthPub(ClientPid, ClientId, Username, PubList);
         _ ->
           true
       end,
@@ -112,10 +112,22 @@ handleAuthResult(Json) ->
       {error, "Auth Failure"}
   end.
 
-handleAuthSub(_SubList) ->
+handleAuthSub(ClientPid, ClientId, Username, _SubList) ->
+  PrivateTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
+  CommandTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/command/+/" ++ binary_to_list(Username) ++ "/"),
+  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
+  ClientPid ! {subscribe, TopicTable},
   ok.
 
-handleAuthPub(_PubList) ->
+handleAuthPub(_ClientPid, _ClientId, _Username, _PubList) ->
   ok.
 
+%% handle connect subscribe
+handle_connect_subscribe(_ClientId, _ClientPid, undefined) -> ok;
+handle_connect_subscribe(ClientId, ClientPid, Username) ->
+  PrivateTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/+/" ++ binary_to_list(Username) ++ "/"),
+  CommandTopic = list_to_binary("$" ++ parser_app_by_clientId(ClientId) ++ "/command/+/" ++ binary_to_list(Username) ++ "/"),
+  TopicTable = [{PrivateTopic, 1}, {CommandTopic, 1}],
+  ClientPid ! {subscribe, TopicTable},
+  ok.
 description() -> "Emq Policy Server AUTH module".
