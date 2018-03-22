@@ -86,16 +86,31 @@ request_auth_hook(ClientId, Username, Password, Action, #http_request{method = M
 
 handleAuthResult(Json) ->
   JSONBody = jsx:decode(Json),
-  {_, IsUser} = lists:keyfind(<<"is_user">>, 1, JSONBody),
-  {_, IsSuper} = lists:keyfind(<<"is_super">>, 1, JSONBody),
-  case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-    ok
-  end,
-  case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-    ok
-  end,
-  IsUserFlag = validate_boolean(IsUser),
-  IsSuperFlag = validate_boolean(IsSuper),
-  {if IsUserFlag -> ok; true -> error end, IsSuperFlag}.
+  case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
+    IsUserFlag = validate_boolean(IsUser),
+    if IsUserFlag ->
+      IsSuperFlag = false,
+      case lists:keyfind(<<"is_super">>, 1, JSONBody) of {_, IsSuper} ->
+        IsSuperFlag = validate_boolean(IsSuper),
+        ok
+      end,
+      case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
+        handleAuthSub(SubList)
+      end,
+      case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
+        handleAuthPub(PubList)
+      end,
+      {ok, IsSuperFlag};
+      true ->
+        {error, "Auth Failure"},
+        {error, false}
+    end
+  end.
+
+handleAuthSub(_SubList) ->
+  ok.
+
+handleAuthPub(_PubList) ->
+  ok.
 
 description() -> "Emq Policy Server AUTH module".
