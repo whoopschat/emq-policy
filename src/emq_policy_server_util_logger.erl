@@ -26,11 +26,17 @@
 
 -define(LOG(Level, Format, Args), lager:log(Level, self(), Format, Args)).
 
--export([log/2]).
+-export([errorLog/2, debugLog/2]).
 
-log(Format, Args) ->
+errorLog(Format, Args) ->
+  log(error, Format, Args).
+
+debugLog(Format, Args) ->
+  log(debug, Format, Args).
+
+log(Level, Format, Args) ->
   try
-    ?LOG(debug, Format, Args)
+    ?LOG(Level, Format, Args)
   catch
     throw:Term ->
       Term;

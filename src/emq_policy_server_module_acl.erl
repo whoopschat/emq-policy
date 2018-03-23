@@ -31,7 +31,7 @@
 -include_lib("emqttd/include/emqttd.hrl").
 
 -import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
--import(emq_policy_server_util_logger, [log/2]).
+-import(emq_policy_server_util_logger, [errorLog/2]).
 
 %% Callbacks
 -export([init/1, check_acl/2, reload_acl/1, description/0]).
@@ -45,17 +45,17 @@ check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
 reload_acl(_State) -> ok.
 
 access(subscribe, ClientId, Topic) ->
-  log("~nacl log (subscribe.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
+  debugLog("~nacl log (subscribe.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
   deny;
 access(publish, ClientId, Topic) ->
   App = parser_app_by_clientId(ClientId),
   IsTopic = string:str(binary_to_list(Topic), "$" ++ App ++ "/") > 0,
   if
     IsTopic ->
-      log("~nacl log (publish.acl):~nclientId:~s topic: ~s allow~n=====================================================~n", [ClientId, Topic]),
+      debugLog("~nacl log (publish.acl):~nclientId:~s topic: ~s allow~n=====================================================~n", [ClientId, Topic]),
       allow;
     true ->
-      log("~nacl log (publish.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
+      debugLog("~nacl log (publish.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
       deny
   end.
 

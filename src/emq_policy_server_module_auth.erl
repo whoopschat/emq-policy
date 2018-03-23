@@ -33,7 +33,7 @@
 -import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1, validate_boolean/1, replace_str/3]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
--import(emq_policy_server_util_logger, [log/2]).
+-import(emq_policy_server_util_logger, [errorLog/2, debugLog/2]).
 
 -define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
 
@@ -46,7 +46,7 @@ init(Env) ->
 check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
   {error, username_or_password_undefined};
 check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
-  log("~nauth log (user.auth):~nclient(~s/~s)~n=====================================================~n", [Username, ClientId]),
+  debugLog("~nauth log (user.auth):~nclient(~s/~s)~n=====================================================~n", [Username, ClientId]),
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
@@ -72,7 +72,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     , {password, Password}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    log("~nrequest_auth_hook ~nCode: ~p,~nBody: ~p~n=====================================================~n", [Code, Body]),
+    debugLog("~nrequest_auth_hook ~nCode: ~p,~nBody: ~p~n=====================================================~n", [Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
@@ -82,7 +82,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
         {error, "Auth Failure"}
     end;
     {error, Error} ->
-      log("~naction: ~p~nError: ~p~n=====================================================~n", [Action, Error]),
+      errorLog("~naction: ~p~nError: ~p~n=====================================================~n", [Action, Error]),
       {error, Error}
   end.
 

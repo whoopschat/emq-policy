@@ -26,8 +26,6 @@
 
 -include("emq_policy_server.hrl").
 
--import(emq_policy_server_util_logger, [log/2]).
-
 -export([requestSync/3, env_http_request/0]).
 
 env_http_request() ->
@@ -40,19 +38,6 @@ env_http_request() ->
 %%--------------------------------------------------------------------
 %% HTTP Request
 %%--------------------------------------------------------------------
-
-%%requestAsync(get, Url, Params) ->
-%%  Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
-%%  {ok, RequestId} = httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
-%%  receive {http, {RequestId, _Result}} -> ok after 0 -> error end,
-%%  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> error end,
-%%  ok;
-%%requestAsync(post, Url, Params) ->
-%%  Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
-%%  {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
-%%  receive {http, {RequestId, _Result}} -> ok after 0 -> error end,
-%%  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> error end,
-%%  ok.
 
 requestSync(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
