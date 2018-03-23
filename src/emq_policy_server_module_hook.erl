@@ -158,6 +158,7 @@ request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_reque
 
 handleAskResult(ClientId, Username, Json) ->
   JSONBody = jsx:decode(Json),
+  log("~handleAskResult JSON : ~s~n=====================================================~n", [Json]),
   case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
     handleAskSub(ClientId, Username, SubList);
     _ ->
