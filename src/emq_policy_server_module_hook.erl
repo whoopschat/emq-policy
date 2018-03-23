@@ -142,7 +142,7 @@ request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_reque
     , {payload, Payload}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    log("~nrequest_message_ask_hook ~nCode:~p,~nBody: ~p~n=====================================================~n", [Code, Json]),
+    log("~nrequest_message_ask_hook ~nCode:~p,~nBody: ~p~n=====================================================~n", [Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
