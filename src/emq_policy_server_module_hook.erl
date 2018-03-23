@@ -31,6 +31,7 @@
 -import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_clientId/2, replace_str/3, format_from/1]).
 -import(emq_policy_server_util_http, [request/3, requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_logger, [log/2]).
+-import(emq_policy_server_util_binary, [trimBOM/1]).
 
 -export([load/1, unload/0]).
 
