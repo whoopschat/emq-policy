@@ -45,17 +45,17 @@ check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
 reload_acl(_State) -> ok.
 
 access(subscribe, ClientId, Topic) ->
-  log("acl log (subscribe.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
+  log("~nacl log (subscribe.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
   deny;
 access(publish, ClientId, Topic) ->
   App = parser_app_by_clientId(ClientId),
   IsTopic = string:str(binary_to_list(Topic), "$" ++ App ++ "/") > 0,
   if
     IsTopic ->
-      log("acl log (publish.acl):~nclientId:~s topic: ~s allow~n=====================================================~n", [ClientId, Topic]),
+      log("~nacl log (publish.acl):~nclientId:~s topic: ~s allow~n=====================================================~n", [ClientId, Topic]),
       allow;
     true ->
-      log("acl log (publish.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
+      log("~nacl log (publish.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
       deny
   end.
 
