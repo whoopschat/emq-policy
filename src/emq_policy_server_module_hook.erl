@@ -148,6 +148,7 @@ request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_reque
       IsJson ->
         handleAskResult(ClientId, Username, Json);
       true ->
+        log("~nrequest_message_ask_hook JSON ERROR: ~p~n=====================================================~n", [Json]),
         error
     end;
     {ok, _Code, _Body} ->
