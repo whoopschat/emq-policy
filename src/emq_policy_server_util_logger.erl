@@ -29,7 +29,7 @@
 log(Format, Args) ->
   try
     io:format("[DEBUG] " ++ Format, Args),
-    lager:warning(Format, Args)
+    lager:error(Format, Args)
   catch
     throw:Term ->
       Term;
