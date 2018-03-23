@@ -24,8 +24,7 @@
 
 -module(emq_policy_server_util_logger).
 
--define(LOG(Level, Format, Args),
-  lager:Level(Format, [Args])).
+-define(LOG(Level, Format, Args), lager:Level(Format, Args)).
 
 -export([log/2]).
 
