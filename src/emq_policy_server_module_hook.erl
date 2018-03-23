@@ -148,30 +148,33 @@ request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_reque
       IsJson ->
         handleAskResult(ClientId, Username, Json);
       true ->
-        {error, "Auth Failure"}
+        error
     end;
-    {ok, Code, _Body} ->
-      {error, Code};
-    {error, Error} ->
-      {error, Error}
+    {ok, _Code, _Body} ->
+      error;
+    {error, _Error} ->
+      error
   end.
 
 handleAskResult(ClientId, Username, Json) ->
   JSONBody = jsx:decode(Json),
-  log("~handleAskResult JSON : ~s~n=====================================================~n", [Json]),
+  log("~nrequest_message_ask_hook JSON : ~p~n=====================================================~n", [JSONBody]),
   case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
     handleAskSub(ClientId, Username, SubList);
     _ ->
+      log("~nnot sub_list : ~n=====================================================~n", []),
       true
   end,
   case lists:keyfind(<<"un_sub_list">>, 1, JSONBody) of {_, UnSubList} ->
     handleAskUnSub(ClientId, Username, UnSubList);
     _ ->
+      log("~nnot un_sub_list : ~n=====================================================~n", []),
       true
   end,
   case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
     handleAskPub(ClientId, Username, PubList);
     _ ->
+      log("~nnot pub_list : ~n=====================================================~n", []),
       true
   end,
   ok.
