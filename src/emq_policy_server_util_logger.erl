@@ -26,9 +26,12 @@
 
 -export([log/2]).
 
-log(Str, Value) ->
+-define(LOG(Level, Format, Args),
+  lager:Level([{client, State#state.client_id}], Format, Args)).
+
+log(Format, Args) ->
   try
-    io:format(Str, Value)
+    ?LOG(debug, Format, Args)
   catch
     throw:Term ->
       Term;

@@ -46,7 +46,7 @@ init(Env) ->
 check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
   {error, username_or_password_undefined};
 check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
-  log("auth log (user.auth):~nclient(~s/~s)~n=====================================================~n", [Username, ClientId]),
+  log("~nauth log (user.auth):~nclient(~s/~s)~n=====================================================~n", [Username, ClientId]),
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
