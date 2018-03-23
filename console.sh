@@ -6,7 +6,7 @@ EMQ_DIR=${BUILD_DIR}/emq-relx
 
 echo -e
 echo "======================================="
-echo "|          Start EMQ Server           |"
+echo "|         Console EMQ Server          |"
 echo "======================================="
 echo -e
 

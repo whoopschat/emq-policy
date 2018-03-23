@@ -29,7 +29,7 @@
 -include_lib("emqttd/include/emqttd.hrl").
 
 -import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_clientId/2, replace_str/3, format_from/1]).
--import(emq_policy_server_util_http, [request/3, requestSync/3, env_http_request/0]).
+-import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_logger, [log/2]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 
@@ -92,7 +92,7 @@ hook_message_delivered(ClientId, Username, Message = #mqtt_message{topic = Topic
 %% hook message ask
 hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   log("~nmessage log (message.acked):~nclient(~s/~s) acked: ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
-  request_message_ask_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
+  request_message_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
   {ok, Message}.
 
 %%--------------------------------------------------------------------
@@ -109,7 +109,20 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
     , {client_id, ClientId}
     , {username, Username}
   ],
-  request(Method, Url, Params).
+  case requestSync(Method, Url, Params) of {ok, Code, Body} ->
+    log("~naction: ~p~nCode:~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
+    Json = trimBOM(list_to_binary(Body)),
+    IsJson = jsx:is_json(Json),
+    if
+      IsJson ->
+        handle_request_result(ClientId, Username, Json);
+      true ->
+        error
+    end;
+    {error, Error} ->
+      log("~naction: ~p~nError: ~p~n=====================================================~n", [Action, Error]),
+      error
+  end.
 
 request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = message,
@@ -123,59 +136,41 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
     , {topic, Topic}
     , {payload, Payload}
   ],
-  request(Method, Url, Params).
-
-%%--------------------------------------------------------------------
-%% Request Ask
-%%--------------------------------------------------------------------
-
-request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
-  Mod = message,
-  Params = [
-    {server_key, ServerKey}
-    , {app_id, parser_app_by_clientId(ClientId)}
-    , {module, Mod}
-    , {action, Action}
-    , {client_id, ClientId}
-    , {username, Username}
-    , {topic, Topic}
-    , {payload, Payload}
-  ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    log("~nrequest_message_ask_hook ~nCode:~p,~nBody: ~p~n=====================================================~n", [Code, Body]),
+    log("~naction: ~p~nCode:~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handleAskResult(ClientId, Username, Json);
+        handle_request_result(ClientId, Username, Json);
       true ->
         error
     end;
     {error, Error} ->
-      log("~nrequest_message_ask_hook ~nError: ~p~n=====================================================~n", [Error]),
+      log("~naction: ~p~nError: ~p~n=====================================================~n", [Action, Error]),
       error
   end.
 
-handleAskResult(ClientId, Username, Json) ->
+handle_request_result(ClientId, Username, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-    handleAskSub(ClientId, Username, SubList);
+    handleResultSub(ClientId, Username, SubList);
     _ ->
       true
   end,
   case lists:keyfind(<<"un_sub_list">>, 1, JSONBody) of {_, UnSubList} ->
-    handleAskUnSub(ClientId, Username, UnSubList);
+    handleResultUnSub(ClientId, Username, UnSubList);
     _ ->
       true
   end,
   case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-    handleAskPub(ClientId, Username, PubList);
+    handleResultPub(ClientId, Username, PubList);
     _ ->
       true
   end,
   ok.
 
-handleAskPub(ClientId, _Username, PubList) when is_list(PubList) ->
+handleResultPub(ClientId, _Username, PubList) when is_list(PubList) ->
   try
     lists:map(fun(Pub) ->
       if is_list(Pub) ->
@@ -201,10 +196,10 @@ handleAskPub(ClientId, _Username, PubList) when is_list(PubList) ->
       Reason
   end,
   ok;
-handleAskPub(_, _, _) ->
+handleResultPub(_, _, _) ->
   ok.
 
-handleAskSub(ClientId, Username, SubList) when is_list(SubList) ->
+handleResultSub(ClientId, Username, SubList) when is_list(SubList) ->
   try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
@@ -219,10 +214,10 @@ handleAskSub(ClientId, Username, SubList) when is_list(SubList) ->
       Reason
   end,
   ok;
-handleAskSub(_, _, _) ->
+handleResultSub(_, _, _) ->
   ok.
 
-handleAskUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
+handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
   try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
@@ -237,7 +232,7 @@ handleAskUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
       Reason
   end,
   ok;
-handleAskUnSub(_, _, _) ->
+handleResultUnSub(_, _, _) ->
   ok.
 
 handleTopic(Topic, ClientId, Username) ->

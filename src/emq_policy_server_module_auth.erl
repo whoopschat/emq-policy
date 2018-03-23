@@ -77,7 +77,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handleAuthResult(ClientPid, ClientId, Username, Json);
+        handle_request_result(ClientPid, ClientId, Username, Json);
       true ->
         {error, "Auth Failure"}
     end;
@@ -85,16 +85,11 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
       {error, Error}
   end.
 
-handleAuthResult(ClientPid, ClientId, Username, Json) ->
+handle_request_result(_ClientPid, _ClientId, _Username, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
     IsUserFlag = validate_boolean(IsUser),
     if IsUserFlag ->
-      case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-        handleAuthSub(ClientPid, ClientId, Username, SubList);
-        _ ->
-          true
-      end,
       case lists:keyfind(<<"is_super">>, 1, JSONBody) of {_, IsSuper} ->
         IsSuperFlag = validate_boolean(IsSuper),
         {ok, IsSuperFlag};
@@ -106,36 +101,6 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
     end;
     _ ->
       {error, "Auth Failure"}
-  end.
-
-handleAuthSub(ClientPid, ClientId, Username, SubList) when is_list(SubList) ->
-  try
-    TopicTable = [{handleTopic(Topic, ClientId, Username), 1} || Topic <- SubList],
-    ClientPid ! {subscribe, TopicTable}
-  catch
-    throw:Term ->
-      Term;
-    exit:Reason ->
-      Reason;
-    error:Reason ->
-      Reason
-  end,
-  ok;
-handleAuthSub(_, _, _, _) ->
-  ok.
-
-handleTopic(Topic, ClientId, Username) ->
-  try
-    FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
-    FixAppId = replace_str(FixUsername, ":app_id", parser_app_by_clientId(ClientId)),
-    list_to_binary(FixAppId)
-  catch
-    throw:_Term ->
-      Topic;
-    exit:_Reason ->
-      Topic;
-    error:_Reason ->
-      Topic
   end.
 
 description() -> "Emq Policy Server AUTH module".

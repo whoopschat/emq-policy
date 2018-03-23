@@ -28,7 +28,7 @@
 
 -import(emq_policy_server_util_logger, [log/2]).
 
--export([request/3, requestSync/3, env_http_request/0]).
+-export([requestSync/3, env_http_request/0]).
 
 env_http_request() ->
   Config = application:get_env(emq_policy_server, api, undefined),
@@ -40,18 +40,19 @@ env_http_request() ->
 %%--------------------------------------------------------------------
 %% HTTP Request
 %%--------------------------------------------------------------------
-request(get, Url, Params) ->
-  Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
-  {ok, RequestId} = httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
-  receive {http, {RequestId, _Result}} -> ok after 0 -> warning end,
-  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> warning end,
-  ok;
-request(post, Url, Params) ->
-  Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
-  {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
-  receive {http, {RequestId, _Result}} -> ok after 0 -> warning end,
-  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> warning end,
-  ok.
+
+%%requestAsync(get, Url, Params) ->
+%%  Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
+%%  {ok, RequestId} = httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
+%%  receive {http, {RequestId, _Result}} -> ok after 0 -> error end,
+%%  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> error end,
+%%  ok;
+%%requestAsync(post, Url, Params) ->
+%%  Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
+%%  {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
+%%  receive {http, {RequestId, _Result}} -> ok after 0 -> error end,
+%%  receive {http, {RequestId, {error, _Reason}}} -> ok after 0 -> error end,
+%%  ok.
 
 requestSync(get, Url, Params) ->
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
