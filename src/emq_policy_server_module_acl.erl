@@ -39,7 +39,8 @@
 init(Env) ->
   {ok, Env}.
 
-check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
+check_acl({Client = #mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
+  log("acl log  : ~p ~p ~p~n=====================================================~n", [Client, PubSub, Topic]),
   access(PubSub, ClientId, Topic).
 
 reload_acl(_State) -> ok.
