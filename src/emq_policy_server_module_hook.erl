@@ -141,19 +141,18 @@ request_message_ask_hook(Topic, Payload, ClientId, Username, Action, #http_reque
     , {topic, Topic}
     , {payload, Payload}
   ],
-  case requestSync(Method, Url, Params) of {ok, 200, Body} ->
+  case requestSync(Method, Url, Params) of {ok, Code, Body} ->
+    log("~nrequest_message_ask_hook ~nCode:~p,~nBody: ~p~n=====================================================~n", [Code, Json]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
         handleAskResult(ClientId, Username, Json);
       true ->
-        log("~nrequest_message_ask_hook JSON ERROR: ~n~p~n=====================================================~n", [Json]),
         error
     end;
-    {ok, _Code, _Body} ->
-      error;
-    {error, _Error} ->
+    {error, Error} ->
+      log("~nrequest_message_ask_hook ~nError: ~p~n=====================================================~n", [Error]),
       error
   end.
 

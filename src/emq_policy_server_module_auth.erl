@@ -71,7 +71,8 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     , {username, Username}
     , {password, Password}
   ],
-  case requestSync(Method, Url, Params) of {ok, 200, Body} ->
+  case requestSync(Method, Url, Params) of {ok, Code, Body} ->
+    log("~nrequest_auth_hook ~nCode:~p,~nBody: ~p~n=====================================================~n", [Code, Json]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
@@ -80,8 +81,6 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
       true ->
         {error, "Auth Failure"}
     end;
-    {ok, Code, _Body} ->
-      {error, Code};
     {error, Error} ->
       {error, Error}
   end.
