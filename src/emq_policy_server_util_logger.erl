@@ -24,15 +24,15 @@
 
 -module(emq_policy_server_util_logger).
 
--define(LOG(Level, Format, Args, ClientId),
-  lager:Level([{client, ClientId}], "Session(~s): " ++ Format, [ClientId | Args])).
+-define(LOG(Level, Format, Args),
+  lager:Level(Format, [Args])).
 
 -export([log/2]).
 
 log(Format, Args) ->
 %%  try
-    io:format("[DEBUG] " ++ Format, Args),
-    ?LOG(error, Format, Args, "-----------------------"),
+  io:format("[DEBUG] " ++ Format, Args),
+  ?LOG(error, Format, Args),
 %%  catch
 %%    throw:Term ->
 %%      Term;
