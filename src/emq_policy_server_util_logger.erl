@@ -22,40 +22,24 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_module_acl).
+-module(emq_policy_server_util_logger).
 
--behaviour(emqttd_acl_mod).
+-export([log/2]).
 
-%% include
--include("emq_policy_server.hrl").
--include_lib("emqttd/include/emqttd.hrl").
+log(Str, Value) ->
+  try
+    io:format(Str, Value)
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
+  ok.
 
--import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
--import(emq_policy_server_util_logger, [log/2]).
 
-%% Callbacks
--export([init/1, check_acl/2, reload_acl/1, description/0]).
 
-init(Env) ->
-  {ok, Env}.
 
-check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
-  access(PubSub, ClientId, Topic).
 
-reload_acl(_State) -> ok.
-
-access(subscribe, ClientId, Topic) ->
-  log("subscribe log (subscribe.acl):~nclientId:~s topic: ~s)~n=====================================================~n", [ClientId, Topic]),
-  deny;
-access(publish, ClientId, Topic) ->
-  log("publish log (publish.acl):~nclientId:~s topic: ~s)~n=====================================================~n", [ClientId, Topic]),
-  App = parser_app_by_clientId(ClientId),
-  IsTopic = string:str(binary_to_list(Topic), "$" ++ App ++ "/") > 0,
-  if
-    IsTopic ->
-      allow;
-    true ->
-      deny
-  end.
-
-description() -> "Emq Policy Server ACL module".

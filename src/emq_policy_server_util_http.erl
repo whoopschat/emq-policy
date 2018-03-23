@@ -25,7 +25,6 @@
 -module(emq_policy_server_util_http).
 
 -include("emq_policy_server.hrl").
--include_lib("emqttd/include/emqttd.hrl").
 
 -export([request/3, requestSync/3, env_http_request/0]).
 

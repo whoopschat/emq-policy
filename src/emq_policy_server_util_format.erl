@@ -24,9 +24,6 @@
 
 -module(emq_policy_server_util_format).
 
-%% include
--include_lib("emqttd/include/emqttd.hrl").
-
 -export([parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_boolean/1, validate_clientId/2, format_from/1, replace_str/3]).
 
 %%　client : $client/{$app_id}/{$device}/{$username}/

@@ -33,6 +33,7 @@
 -import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1, validate_boolean/1, replace_str/3]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
+-import(emq_policy_server_util_logger, [log/2]).
 
 -define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
 
@@ -45,6 +46,7 @@ init(Env) ->
 check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
   {error, username_or_password_undefined};
 check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
+  log("auth log (user.auth):~nclient(~s/~s)~n=====================================================~n", [Username, ClientId]),
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
@@ -125,9 +127,9 @@ handleAuthSub(_, _, _, _) ->
 
 handleTopic(Topic, ClientId, Username) ->
   try
-  FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
-  FixAppId = replace_str(FixUsername, ":app_id", parser_app_by_clientId(ClientId)),
-  list_to_binary(FixAppId)
+    FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
+    FixAppId = replace_str(FixUsername, ":app_id", parser_app_by_clientId(ClientId)),
+    list_to_binary(FixAppId)
   catch
     throw:_Term ->
       Topic;
