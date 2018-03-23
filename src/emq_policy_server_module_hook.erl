@@ -163,6 +163,11 @@ handleAskResult(ClientId, Username, Json) ->
     _ ->
       true
   end,
+  case lists:keyfind(<<"un_sub_list">>, 1, JSONBody) of {_, SubList} ->
+    handleAskUnSub(ClientId, Username, SubList);
+    _ ->
+      true
+  end,
   case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
     handleAskPub(ClientId, Username, PubList);
     _ ->
@@ -172,10 +177,21 @@ handleAskResult(ClientId, Username, Json) ->
 
 handleAskPub(ClientId, _Username, PubList) when is_list(PubList) ->
   try
-    lists:map(fun({Topic, Payload}) ->
-      Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
-      emqttd:publish(Msg#mqtt_message{retain = true}),
-      {Topic, Payload} end, PubList)
+    lists:map(fun(Pub) ->
+      if is_list(Pub) ->
+        Len = erlang:length(Pub),
+        if
+          Len >= 2 ->
+            Topic = lists:nth(1, Pub),
+            Payload = lists:nth(2, Pub),
+            Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
+            emqttd:publish(Msg#mqtt_message{retain = true}),
+            ok;
+          true ->
+            error
+        end;
+        true -> error end,
+      Pub end, PubList)
   catch
     throw:Term ->
       Term;
@@ -204,6 +220,24 @@ handleAskSub(ClientId, Username, SubList) when is_list(SubList) ->
   end,
   ok;
 handleAskSub(_, _, _) ->
+  ok.
+
+handleAskUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
+  try
+    Client = emqttd_cm:lookup(ClientId),
+    ClientPid = Client#mqtt_client.client_pid,
+    TopicTable = [handleTopic(S, ClientId, Username) || S <- UnSubList],
+    ClientPid ! {unsubscribe, TopicTable}
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
+  ok;
+handleAskUnSub(_, _, _) ->
   ok.
 
 handleTopic(Topic, ClientId, Username) ->
