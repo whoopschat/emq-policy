@@ -40,6 +40,8 @@
 -export([hook_message_publish/2, hook_message_delivered/4, hook_message_ack/4]).
 
 load(Env) ->
+  emqttd:hook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [Env]),
+  emqttd:hook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4, [Env]),
   emqttd:hook('client.connected', fun ?MODULE:hook_client_connected/3, [Env]),
   emqttd:hook('client.disconnected', fun ?MODULE:hook_client_disconnected/3, [Env]),
   emqttd:hook('message.publish', fun ?MODULE:hook_message_publish/2, [Env]),
@@ -47,6 +49,8 @@ load(Env) ->
   emqttd:hook('message.acked', fun ?MODULE:hook_message_ack/4, [Env]).
 
 unload() ->
+  emqttd:unhook('client.subscribe', fun ?MODULE:on_client_subscribe/4),
+  emqttd:unhook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4),
   emqttd:unhook('client.connected', fun ?MODULE:hook_client_connected/3),
   emqttd:unhook('client.disconnected', fun ?MODULE:hook_client_disconnected/3),
   emqttd:unhook('message.publish', fun ?MODULE:hook_message_publish/2),
@@ -57,15 +61,23 @@ unload() ->
 %% Client Hook
 %%--------------------------------------------------------------------
 
+on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
+  log("~nclient log (client.subscribe):~nclient(~s/~s) will subscribe: ~p~n=====================================================~n", [Username, ClientId, TopicTable]),
+  {ok, TopicTable}.
+
+on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
+  log("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n=====================================================~n", [ClientId, Username, TopicTable]),
+  {ok, TopicTable}.
+
 %% hook client connected
 hook_client_connected(ConnAck, Client = #mqtt_client{client_id = ClientId}, _Env) ->
-  log("~nconnect log (client.connected):~nclient ~s connected, connack: ~w~n=====================================================~n", [ClientId, ConnAck]),
+  log("~nclient log (client.connected):~nclient ~s connected, connack: ~w~n=====================================================~n", [ClientId, ConnAck]),
   request_connect_hook(Client, client_connected, env_http_request()),
   {ok, Client}.
 
 %% hook client connected
 hook_client_disconnected(Reason, Client = #mqtt_client{client_id = ClientId}, _Env) ->
-  log("~nconnect log (client.disconnected):~nclient ~s disconnected, reason: ~w~n=====================================================~n", [ClientId, Reason]),
+  log("~nclient log (client.disconnected):~nclient ~s disconnected, reason: ~w~n=====================================================~n", [ClientId, Reason]),
   request_connect_hook(Client, client_disconnected, env_http_request()),
   ok.
 
@@ -100,7 +112,7 @@ hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payl
 %%--------------------------------------------------------------------
 
 request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
-  Mod = connect,
+  Mod = client,
   Params = [
     {server_key, ServerKey}
     , {app_id, parser_app_by_clientId(ClientId)}
