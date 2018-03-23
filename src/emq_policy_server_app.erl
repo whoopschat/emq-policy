@@ -30,19 +30,13 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-  reg_auth(),
-  reg_acl(),
   {ok, Sup} = emq_policy_server_module_super:start_link(),
+  ok = emqttd_access_control:register_mod(auth, emq_policy_server_module_auth, []),
+  ok = emqttd_access_control:register_mod(acl, emq_policy_server_module_acl, []),
   emq_policy_server_module_hook:load(application:get_all_env()),
   {ok, Sup}.
 
 stop(_State) ->
+  ok = emqttd_access_control:unregister_mod(auth, emq_policy_server_module_auth),
+  ok = emqttd_access_control:unregister_mod(acl, emq_policy_server_module_acl),
   emq_policy_server_module_hook:unload().
-
-reg_auth() ->
-  emqttd_access_control:register_mod(auth, emq_policy_server_module_auth, undefined),
-  ok.
-
-reg_acl() ->
-  emqttd_access_control:register_mod(acl, emq_policy_server_module_acl, undefined),
-  ok.
