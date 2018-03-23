@@ -46,7 +46,7 @@ init(Env) ->
 check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
   {error, username_or_password_undefined};
 check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
-  infoLog("~nauth log (user.auth):~nclient(~s/~s)~n=====================================================~n", [Username, ClientId]),
+  infoLog("~nauth log (user.auth):~nclient(~s/~s)~n", [Username, ClientId]),
   IsClient = validate_clientId(ClientId, Username),
   if
     IsClient ->
@@ -72,7 +72,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
     , {password, Password}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    infoLog("~nrequest_auth_hook ~nCode: ~p,~nBody: ~p~n=====================================================~n", [Code, Body]),
+    infoLog("~nrequest_auth_hook ~nCode: ~p,~nBody: ~p~n", [Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
@@ -82,7 +82,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
         {error, "Auth Request JSON Format Error"}
     end;
     {error, Error} ->
-      errorLog("~naction: ~p~nError: ~p~n=====================================================~n", [Action, Error]),
+      errorLog("~naction: ~p~nError: ~p~n", [Action, Error]),
       {error, Error}
   end.
 
