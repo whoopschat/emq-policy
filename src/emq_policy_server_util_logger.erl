@@ -26,15 +26,10 @@
 
 -export([log/2]).
 
-
-%% io:format()
--define(LOG(Format, Args),
-  io:format("[DEBUG] " ++ Format, Args) and lager:debug(Format, Args)
-).
-
 log(Format, Args) ->
   try
-    ?LOG(Format, Args)
+    io:format("[DEBUG] " ++ Format, Args),
+    lager:debug(Format, Args)
   catch
     throw:Term ->
       Term;

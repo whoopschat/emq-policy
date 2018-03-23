@@ -123,7 +123,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
     , {username, Username}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    log("~naction: ~p~nCode:~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
+    log("~naction: ~p~nCode: ~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
@@ -150,7 +150,7 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
     , {payload, Payload}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    log("~naction: ~p~nCode:~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
+    log("~naction: ~p~nCode: ~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
