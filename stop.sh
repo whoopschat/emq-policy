@@ -6,8 +6,8 @@ EMQ_DIR=${BUILD_DIR}/emq-relx
 
 echo -e
 echo "======================================="
-echo "|          Start EMQ Server           |"
+echo "|          Stop EMQ Server           |"
 echo "======================================="
 echo -e
 
-${EMQ_DIR}/_rel/emqttd/bin/emqttd console
+${EMQ_DIR}/_rel/emqttd/bin/emqttd stop
