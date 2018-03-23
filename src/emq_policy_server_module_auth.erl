@@ -79,7 +79,7 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
       IsJson ->
         handle_request_result(ClientPid, ClientId, Username, Json);
       true ->
-        {error, "Auth Failure"}
+        {error, "Auth Request JSON Format Error"}
     end;
     {error, Error} ->
       errorLog("~naction: ~p~nError: ~p~n=====================================================~n", [Action, Error]),
