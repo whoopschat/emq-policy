@@ -30,17 +30,17 @@
 -export([log/2]).
 
 log(Format, Args) ->
-  try
+%%  try
     io:format("[DEBUG] " ++ Format, Args),
-    ?LOG(error, Format, Args, "-----------------------")
-  catch
-    throw:Term ->
-      Term;
-    exit:Reason ->
-      Reason;
-    error:Reason ->
-      Reason
-  end,
+    ?LOG(error, Format, Args, "-----------------------"),
+%%  catch
+%%    throw:Term ->
+%%      Term;
+%%    exit:Reason ->
+%%      Reason;
+%%    error:Reason ->
+%%      Reason
+%%  end,
   ok.
 
 
