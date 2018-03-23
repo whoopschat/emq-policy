@@ -26,7 +26,10 @@
 
 -export([log/2]).
 
+
+%% io:format()
 -define(LOG(Level, Format, Args),
+  io:format("[" ++ Level ++ "] " ++ Format, Args),
   lager:Level(Format, Args)).
 
 log(Format, Args) ->
