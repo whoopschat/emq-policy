@@ -111,7 +111,7 @@ handleAuthResult(ClientPid, ClientId, Username, Json) ->
 
 handleAuthSub(ClientPid, ClientId, Username, SubList) when is_list(SubList) ->
   try
-    TopicTable = [{handleTopic(S, ClientId, Username), 1} || S <- SubList],
+    TopicTable = [{handleTopic(Topic, ClientId, Username), 1} || Topic <- SubList],
     ClientPid ! {subscribe, TopicTable}
   catch
     throw:Term ->
@@ -138,23 +138,5 @@ handleTopic(Topic, ClientId, Username) ->
     error:_Reason ->
       Topic
   end.
-
-%%handleAuthPub(_ClientPid, ClientId, _Username, PubList) when is_list(PubList) ->
-%%  try
-%%    lists:map(fun({Topic, Payload}) ->
-%%      Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
-%%      emqttd:publish(Msg#mqtt_message{retain = true}),
-%%      {Topic, Payload} end, PubList)
-%%  catch
-%%    throw:Term ->
-%%      Term;
-%%    exit:Reason ->
-%%      Reason;
-%%    error:Reason ->
-%%      Reason
-%%  end,
-%%  ok;
-%%handleAuthPub(_, _, _, _) ->
-%%  ok.
 
 description() -> "Emq Policy Server AUTH module".
