@@ -10,4 +10,4 @@ echo "|          Start EMQ Server           |"
 echo "======================================="
 echo -e
 
-${EMQ_DIR}/_rel/emqttd/bin/emqttd console
+${EMQ_DIR}/_rel/emqttd/bin/emqttd start
