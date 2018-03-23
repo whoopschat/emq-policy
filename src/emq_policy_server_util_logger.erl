@@ -29,13 +29,12 @@
 
 %% io:format()
 -define(LOG(Level, Format, Args),
-  io:format("[" ++ Level ++ "] " ++ Format, Args)
-%%  lager:Level(Format, Args)
+  io:format("[" ++ Level ++ "] ~n" ++ Format, Args) %% and lager:Level(Format, Args)
 ).
 
 log(Format, Args) ->
   try
-    ?LOG(debug, Format, Args)
+    ?LOG("DEBUG", Format, Args)
   catch
     throw:Term ->
       Term;
