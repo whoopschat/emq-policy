@@ -26,13 +26,13 @@
 
 -define(LOG(Level, Format, Args), lager:log(Level, self(), Format, Args)).
 
--export([errorLog/2, debugLog/2]).
+-export([errorLog/2, infoLog/2]).
 
 errorLog(Format, Args) ->
   log(error, Format, Args).
 
-debugLog(Format, Args) ->
-  log(debug, Format, Args).
+infoLog(Format, Args) ->
+  log(info, Format, Args).
 
 log(Level, Format, Args) ->
   try

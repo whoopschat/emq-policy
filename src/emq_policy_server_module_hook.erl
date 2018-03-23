@@ -30,7 +30,7 @@
 
 -import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_clientId/2, replace_str/3, format_from/1]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
--import(emq_policy_server_util_logger, [errorLog/2, debugLog/2]).
+-import(emq_policy_server_util_logger, [errorLog/2, infoLog/2]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 
 -export([load/1, unload/0]).
@@ -63,22 +63,22 @@ unload() ->
 %%--------------------------------------------------------------------
 
 hook_client_subscribe(ClientId, Username, TopicTable, _Env) ->
-  debugLog("~nclient log (client.subscribe):~nclient(~s/~s) will subscribe: ~p~n=====================================================~n", [Username, ClientId, TopicTable]),
+  infoLog("~nclient log (client.subscribe):~nclient(~s/~s) will subscribe: ~p~n=====================================================~n", [Username, ClientId, TopicTable]),
   {ok, TopicTable}.
 
 hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
-  debugLog("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n=====================================================~n", [ClientId, Username, TopicTable]),
+  infoLog("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n=====================================================~n", [ClientId, Username, TopicTable]),
   {ok, TopicTable}.
 
 %% hook client connected
 hook_client_connected(ConnAck, Client = #mqtt_client{client_id = ClientId}, _Env) ->
-  debugLog("~nclient log (client.connected):~nclient ~s connected, connack: ~w~n=====================================================~n", [ClientId, ConnAck]),
+  infoLog("~nclient log (client.connected):~nclient ~s connected, connack: ~w~n=====================================================~n", [ClientId, ConnAck]),
   request_connect_hook(Client, client_connected, env_http_request()),
   {ok, Client}.
 
 %% hook client connected
 hook_client_disconnected(Reason, Client = #mqtt_client{client_id = ClientId}, _Env) ->
-  debugLog("~nclient log (client.disconnected):~nclient ~s disconnected, reason: ~w~n=====================================================~n", [ClientId, Reason]),
+  infoLog("~nclient log (client.disconnected):~nclient ~s disconnected, reason: ~w~n=====================================================~n", [ClientId, Reason]),
   request_connect_hook(Client, client_disconnected, env_http_request()),
   ok.
 
@@ -91,20 +91,20 @@ hook_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _En
   {ok, Message};
 
 hook_message_publish(Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
-  debugLog("~nmessage log (message.publish):~npublish ~s~n=====================================================~n", [emqttd_message:format(Message)]),
+  infoLog("~nmessage log (message.publish):~npublish ~s~n=====================================================~n", [emqttd_message:format(Message)]),
   {FromClientId, FromUsername} = format_from(Message#mqtt_message.from),
   request_message_hook(Topic, Payload, FromClientId, FromUsername, message_publish, env_http_request()),
   {ok, Message}.
 
 %% hook message delivered
 hook_message_delivered(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
-  debugLog("~nmessage log (message.delivered):~ndelivered to client(~s/~s): ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
+  infoLog("~nmessage log (message.delivered):~ndelivered to client(~s/~s): ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
   request_message_hook(Topic, Payload, ClientId, Username, message_delivered, env_http_request()),
   {ok, Message}.
 
 %% hook message ask
 hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
-  debugLog("~nmessage log (message.acked):~nclient(~s/~s) acked: ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
+  infoLog("~nmessage log (message.acked):~nclient(~s/~s) acked: ~s~n=====================================================~n", [Username, ClientId, emqttd_message:format(Message)]),
   request_message_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
   {ok, Message}.
 
@@ -123,7 +123,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
     , {username, Username}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    debugLog("~naction: ~p~nCode: ~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
+    infoLog("~naction: ~p~nCode: ~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
@@ -150,7 +150,7 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
     , {payload, Payload}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    debugLog("~naction: ~p~nCode: ~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
+    infoLog("~naction: ~p~nCode: ~p~nBody: ~p~n=====================================================~n", [Action, Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
