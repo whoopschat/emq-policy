@@ -27,7 +27,7 @@
 -export([log/2]).
 
 -define(LOG(Level, Format, Args),
-  lager:Level([{client, State#state.client_id}], Format, Args)).
+  lager:Level(Format, Args)).
 
 log(Format, Args) ->
   try
