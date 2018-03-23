@@ -163,8 +163,8 @@ handleAskResult(ClientId, Username, Json) ->
     _ ->
       true
   end,
-  case lists:keyfind(<<"un_sub_list">>, 1, JSONBody) of {_, SubList} ->
-    handleAskUnSub(ClientId, Username, SubList);
+  case lists:keyfind(<<"un_sub_list">>, 1, JSONBody) of {_, UnSubList} ->
+    handleAskUnSub(ClientId, Username, UnSubList);
     _ ->
       true
   end,
