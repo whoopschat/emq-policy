@@ -36,12 +36,13 @@
 -export([load/1, unload/0]).
 
 %% hooks
+-export([hook_client_subscribe/4, hook_client_unsubscribe/4]).
 -export([hook_client_connected/3, hook_client_disconnected/3]).
 -export([hook_message_publish/2, hook_message_delivered/4, hook_message_ack/4]).
 
 load(Env) ->
-  emqttd:hook('client.subscribe', fun ?MODULE:on_client_subscribe/4, [Env]),
-  emqttd:hook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4, [Env]),
+  emqttd:hook('client.subscribe', fun ?MODULE:hook_client_subscribe/4, [Env]),
+  emqttd:hook('client.unsubscribe', fun ?MODULE:hook_client_unsubscribe/4, [Env]),
   emqttd:hook('client.connected', fun ?MODULE:hook_client_connected/3, [Env]),
   emqttd:hook('client.disconnected', fun ?MODULE:hook_client_disconnected/3, [Env]),
   emqttd:hook('message.publish', fun ?MODULE:hook_message_publish/2, [Env]),
@@ -49,8 +50,8 @@ load(Env) ->
   emqttd:hook('message.acked', fun ?MODULE:hook_message_ack/4, [Env]).
 
 unload() ->
-  emqttd:unhook('client.subscribe', fun ?MODULE:on_client_subscribe/4),
-  emqttd:unhook('client.unsubscribe', fun ?MODULE:on_client_unsubscribe/4),
+  emqttd:unhook('client.subscribe', fun ?MODULE:hook_client_subscribe/4),
+  emqttd:unhook('client.unsubscribe', fun ?MODULE:hook_client_unsubscribe/4),
   emqttd:unhook('client.connected', fun ?MODULE:hook_client_connected/3),
   emqttd:unhook('client.disconnected', fun ?MODULE:hook_client_disconnected/3),
   emqttd:unhook('message.publish', fun ?MODULE:hook_message_publish/2),
@@ -61,11 +62,11 @@ unload() ->
 %% Client Hook
 %%--------------------------------------------------------------------
 
-on_client_subscribe(ClientId, Username, TopicTable, _Env) ->
+hook_client_subscribe(ClientId, Username, TopicTable, _Env) ->
   log("~nclient log (client.subscribe):~nclient(~s/~s) will subscribe: ~p~n=====================================================~n", [Username, ClientId, TopicTable]),
   {ok, TopicTable}.
 
-on_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
+hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
   log("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n=====================================================~n", [ClientId, Username, TopicTable]),
   {ok, TopicTable}.
 
