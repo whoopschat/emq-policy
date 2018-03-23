@@ -41,15 +41,12 @@ env_http_request() ->
 %% HTTP Request
 %%--------------------------------------------------------------------
 request(get, Url, Params) ->
-  ibrowse:send_req(Url, [], get, [],[]),
   Req = {Url ++ "?" ++ mochiweb_util:urlencode(Params), []},
   {ok, RequestId} = httpc:request(get, Req, [{autoredirect, true}], [{sync, false}]),
   receive {http, {RequestId, _Result}} -> ok after 0.01 -> ok end,
   receive {http, {RequestId, {error, _Reason}}} -> ok after 0.01 -> ok end,
   ok;
 request(post, Url, Params) ->
-  Ibrowse = ibrowse:send_req(Url, [{"Content-Type", "application/x-www-form-urlencoded"}], post, mochiweb_util:urlencode(Params)),
-  log("~nibrowse: ~p~n=====================================================~n", [Ibrowse]),
   Req = {Url, [], "application/x-www-form-urlencoded", mochiweb_util:urlencode(Params)},
   {ok, RequestId} = httpc:request(post, Req, [{autoredirect, true}], [{sync, false}]),
   receive {http, {RequestId, _Result}} -> ok after 0.01 -> ok end,
