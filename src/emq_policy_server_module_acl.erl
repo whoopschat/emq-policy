@@ -31,7 +31,7 @@
 -include_lib("emqttd/include/emqttd.hrl").
 
 -import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2]).
--import(emq_policy_server_util_logger, [errorLog/2]).
+-import(emq_policy_server_util_logger, [errorLog/2, debugLog/2]).
 
 %% Callbacks
 -export([init/1, check_acl/2, reload_acl/1, description/0]).
@@ -55,7 +55,7 @@ access(publish, ClientId, Topic) ->
       debugLog("~nacl log (publish.acl):~nclientId:~s topic: ~s allow~n=====================================================~n", [ClientId, Topic]),
       allow;
     true ->
-      debugLog("~nacl log (publish.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
+      errorLog("~nacl log (publish.acl):~nclientId:~s topic: ~s deny~n=====================================================~n", [ClientId, Topic]),
       deny
   end.
 
