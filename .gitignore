@@ -9,3 +9,4 @@ rel/
 deps/
 ebin/
 build/
+.idea
