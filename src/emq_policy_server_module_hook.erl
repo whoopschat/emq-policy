@@ -64,14 +64,12 @@ unload() ->
 
 hook_client_subscribe(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nclient log (client.subscribe):~nclient(~s/~s) will subscribe: ~p~n", [Username, ClientId, TopicTable]),
+  request_subscribe_hook(ClientId, Username, TopicTable, client_subscribe, env_http_request()),
   {ok, TopicTable}.
 
 hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
-  Client = emqttd_cm:lookup(ClientId),
-  ClientPid = Client#mqtt_client.client_pid,
-  Stats = emqttd_session:stats(ClientPid),
-  errorLog("~nsession stats: ~p~n", [Stats]),
+  request_subscribe_hook(ClientId, Username, TopicTable, client_unsubscribe, env_http_request()),
   {ok, TopicTable}.
 
 %% hook client connected
@@ -115,6 +113,32 @@ hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payl
 %%--------------------------------------------------------------------
 %% Request Hook
 %%--------------------------------------------------------------------
+
+request_subscribe_hook(Username, ClientId, TopicTable, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+  Mod = client,
+  Params = [
+    {server_key, ServerKey}
+    , {app_id, parser_app_by_clientId(ClientId)}
+    , {module, Mod}
+    , {action, Action}
+    , {client_id, ClientId}
+    , {username, Username}
+    , {topics, TopicTable}
+  ],
+  case requestSync(Method, Url, Params) of {ok, Code, Body} ->
+    infoLog("~naction: ~p~nCode: ~p~nBody: ~p~n", [Action, Code, Body]),
+    Json = trimBOM(list_to_binary(Body)),
+    IsJson = jsx:is_json(Json),
+    if
+      IsJson ->
+        handle_request_result(ClientId, Username, Json);
+      true ->
+        error
+    end;
+    {error, Error} ->
+      errorLog("~naction: ~p~nError: ~p~n", [Action, Error]),
+      error
+  end.
 
 request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = client,
