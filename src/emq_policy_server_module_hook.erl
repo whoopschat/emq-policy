@@ -68,6 +68,10 @@ hook_client_subscribe(ClientId, Username, TopicTable, _Env) ->
 
 hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
+  Client = emqttd_cm:lookup(ClientId),
+  ClientPid = Client#mqtt_client.client_pid,
+  Stats = emqttd_session:stats(ClientPid),
+  errorLog("~nsession stats: ~p~n", [Stats]),
   {ok, TopicTable}.
 
 %% hook client connected
