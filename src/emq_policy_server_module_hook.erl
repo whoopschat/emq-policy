@@ -123,7 +123,7 @@ request_subscribe_hook(Username, ClientId, TopicTable, Action, #http_request{met
     , {action, Action}
     , {client_id, ClientId}
     , {username, Username}
-    , {topics, TopicTable}
+    , {topics, jsx:encode(TopicTable)}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
     infoLog("~naction: ~p~nCode: ~p~nBody: ~p~n", [Action, Code, Body]),
