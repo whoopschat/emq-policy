@@ -238,29 +238,11 @@ handleResultPub(_, _, _) ->
   ok.
 
 handleResultSub(ClientId, Username, SubList) when is_list(SubList) ->
-  try
-    Client = emqttd_cm:lookup(ClientId),
-    ClientPid = Client#mqtt_client.client_pid,
-    TopicTable = [{handleTopic(Topic, ClientId, Username), 1} || Topic <- SubList],
-    ClientPid ! {subscribe, TopicTable}
-  catch
-    throw:Term ->
-      Term;
-    exit:Reason ->
-      Reason;
-    error:Reason ->
-      Reason
-  end,
-  ok;
-handleResultSub(_, _, _) ->
-  ok.
-
-handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
 %%  try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
-    Topics = [handleTopic(Topic, ClientId, Username) || Topic <- UnSubList],
-    ClientPid ! {unsubscribe, Topics},
+    TopicTable = [{handleTopic(Topic, ClientId, Username), 1} || Topic <- SubList],
+    ClientPid ! {subscribe, TopicTable},
 %%  catch
 %%    throw:Term ->
 %%      Term;
@@ -269,6 +251,24 @@ handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
 %%    error:Reason ->
 %%      Reason
 %%  end,
+  ok;
+handleResultSub(_, _, _) ->
+  ok.
+
+handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
+  try
+    Client = emqttd_cm:lookup(ClientId),
+    ClientPid = Client#mqtt_client.client_pid,
+    Topics = [handleTopic(Topic, ClientId, Username) || Topic <- UnSubList],
+    ClientPid ! {unsubscribe, Topics}
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
   ok;
 handleResultUnSub(_, _, _) ->
   ok.
