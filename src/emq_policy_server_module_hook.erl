@@ -276,7 +276,7 @@ handleResultUnSub(_, _, _) ->
 handleTopic(Topic, ClientId, Username) ->
   try
     FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
-    FixClientId = replace_str(FixUsername, ":client_id", ClientId),
+    FixClientId = replace_str(FixUsername, ":client_id", binary_to_list(ClientId)),
     list_to_binary(FixClientId)
   catch
     throw:_Term ->

@@ -35,20 +35,15 @@
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 -import(emq_policy_server_util_logger, [errorLog/2, infoLog/2]).
 
--define(UNDEFINED(S), (S =:= undefined orelse S =:= <<>>)).
-
 %% Callbacks
 -export([init/1, check/3, description/0]).
 
 init(Env) ->
   {ok, Env}.
 
-check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Username); ?UNDEFINED(Password) ->
-  {error, username_or_password_undefined};
 check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
   infoLog("~nauth log (user.auth):~nclient(~s/~s)~n", [Username, ClientId]),
   request_auth_hook(ClientPid, ClientId, Username, Password, user_auth, env_http_request()).
-
 
 %%--------------------------------------------------------------------
 %% Request Hook
