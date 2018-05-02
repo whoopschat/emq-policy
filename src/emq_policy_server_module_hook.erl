@@ -130,7 +130,7 @@ request_subscribe_hook(Username, ClientId, TopicTable, Action, #http_request{met
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handle_request_result(ClientId, Username, Json);
+        handle_request_result(ClientId, Json);
       true ->
         error
     end;
@@ -154,7 +154,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handle_request_result(ClientId, Username, Json);
+        handle_request_result(ClientId, Json);
       true ->
         error
     end;
