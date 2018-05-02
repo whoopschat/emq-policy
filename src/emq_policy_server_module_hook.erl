@@ -238,19 +238,19 @@ handleResultPub(_, _, _) ->
   ok.
 
 handleResultSub(ClientId, Username, SubList) when is_list(SubList) ->
-%%  try
+  try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
-    TopicTable = [{handleTopic(Topic, ClientId, Username), 1} || Topic <- SubList],
-    ClientPid ! {subscribe, TopicTable},
-%%  catch
-%%    throw:Term ->
-%%      Term;
-%%    exit:Reason ->
-%%      Reason;
-%%    error:Reason ->
-%%      Reason
-%%  end,
+    TopicTable = [{handleTopic(Topic, Username), 1} || Topic <- SubList],
+    ClientPid ! {subscribe, TopicTable}
+  catch
+    throw:Term ->
+      Term;
+    exit:Reason ->
+      Reason;
+    error:Reason ->
+      Reason
+  end,
   ok;
 handleResultSub(_, _, _) ->
   ok.
@@ -259,7 +259,7 @@ handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
   try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
-    Topics = [handleTopic(Topic, ClientId, Username) || Topic <- UnSubList],
+    Topics = [handleTopic(Topic, Username) || Topic <- UnSubList],
     ClientPid ! {unsubscribe, Topics}
   catch
     throw:Term ->
@@ -273,16 +273,15 @@ handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
 handleResultUnSub(_, _, _) ->
   ok.
 
-handleTopic(Topic, ClientId, Username) ->
-%%  try
+handleTopic(Topic, Username) ->
+  try
     FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
-    FixClientId = replace_str(FixUsername, ":client_id", binary_to_list(ClientId)),
-    list_to_binary(FixClientId).
-%%  catch
-%%    throw:_Term ->
-%%      Topic;
-%%    exit:_Reason ->
-%%      Topic;
-%%    error:_Reason ->
-%%      Topic
-%%  end.
+    list_to_binary(FixUsername)
+  catch
+    throw:_Term ->
+      Topic;
+    exit:_Reason ->
+      Topic;
+    error:_Reason ->
+      Topic
+  end.
