@@ -274,15 +274,15 @@ handleResultUnSub(_, _, _) ->
   ok.
 
 handleTopic(Topic, ClientId, Username) ->
-  try
+%%  try
     FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
     FixClientId = replace_str(FixUsername, ":client_id", binary_to_list(ClientId)),
-    list_to_binary(FixClientId)
-  catch
-    throw:_Term ->
-      Topic;
-    exit:_Reason ->
-      Topic;
-    error:_Reason ->
-      Topic
-  end.
+    list_to_binary(FixClientId).
+%%  catch
+%%    throw:_Term ->
+%%      Topic;
+%%    exit:_Reason ->
+%%      Topic;
+%%    error:_Reason ->
+%%      Topic
+%%  end.
