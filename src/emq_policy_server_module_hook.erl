@@ -234,7 +234,7 @@ handleResultPub(ClientId, PubList) when is_list(PubList) ->
       Reason
   end,
   ok;
-handleResultPub(_, _, _) ->
+handleResultPub(_, _) ->
   ok.
 
 handleResultSub(ClientId, SubList) when is_list(SubList) ->
@@ -252,7 +252,7 @@ handleResultSub(ClientId, SubList) when is_list(SubList) ->
       Reason
   end,
   ok;
-handleResultSub(_, _, _) ->
+handleResultSub(_, _) ->
   ok.
 
 handleResultUnSub(ClientId, UnSubList) when is_list(UnSubList) ->
@@ -270,5 +270,5 @@ handleResultUnSub(ClientId, UnSubList) when is_list(UnSubList) ->
       Reason
   end,
   ok;
-handleResultUnSub(_, _, _) ->
+handleResultUnSub(_, _) ->
   ok.
