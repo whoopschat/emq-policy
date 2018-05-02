@@ -24,50 +24,7 @@
 
 -module(emq_policy_server_util_format).
 
--export([parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_boolean/1, validate_clientId/2, format_from/1, replace_str/3]).
-
-%%　client : $client/{$app_id}/{$device}/{$username}/
-parser_app_by_clientId(ClientId) ->
-  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
-  Len = erlang:length(ClientSplit),
-  if
-    Len >= 2 ->
-      lists:nth(2, ClientSplit);
-    true ->
-      ""
-  end.
-
-%%　client : $client/{$app_id}/{$device}/{$username}/
-parser_device_by_clientId(ClientId) ->
-  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
-  Len = erlang:length(ClientSplit),
-  if
-    Len >= 3 ->
-      lists:nth(3, ClientSplit);
-    true ->
-      ""
-  end.
-
-parser_username_by_clientId(ClientId) ->
-  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
-  Len = erlang:length(ClientSplit),
-  if
-    Len >= 4 ->
-      lists:nth(4, ClientSplit);
-    true ->
-      ""
-  end.
-
-%%　validate clientId format
-validate_clientId(ClientId, Username) ->
-  ClientSplit = string:tokens(binary_to_list(ClientId), "/"),
-  Len = erlang:length(ClientSplit),
-  if
-    Len >= 4 ->
-      string:equal(binary_to_list(ClientId), "$client/" ++ lists:nth(2, ClientSplit) ++ "/" ++ lists:nth(3, ClientSplit) ++ "/" ++ binary_to_list(Username) ++ "/");
-    true ->
-      false
-  end.
+-export([validate_boolean/1, format_from/1, replace_str/3]).
 
 validate_boolean(1) ->
   true;
@@ -85,7 +42,7 @@ format_from({ClientId, Username}) ->
 format_from(From) when is_atom(From) ->
   {a2b(From), a2b(From)};
 format_from(From) when is_binary(From) ->
-  {From, parser_username_by_clientId(From)};
+  {From, From};
 format_from(_) ->
   {<<>>, <<>>}.
 

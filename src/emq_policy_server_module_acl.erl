@@ -30,7 +30,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, validate_clientId/2, validate_boolean/1]).
+-import(emq_policy_server_util_format, [validate_boolean/1]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 -import(emq_policy_server_util_logger, [errorLog/2, infoLog/2]).
@@ -46,17 +46,10 @@ check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
 
 reload_acl(_State) -> ok.
 
-access(subscribe, _ClientId, _Topic) ->
-  deny;
+access(subscribe, ClientId, Topic) ->
+  request_acl_hook(ClientId, Topic, subscribe_acl, env_http_request());
 access(publish, ClientId, Topic) ->
-  App = parser_app_by_clientId(ClientId),
-  IsTopic = string:str(binary_to_list(Topic), "$" ++ App ++ "/") > 0,
-  if
-    IsTopic ->
-      request_acl_hook(ClientId, Topic, publish_acl, env_http_request());
-    true ->
-      deny
-  end.
+  request_acl_hook(ClientId, Topic, publish_acl, env_http_request()).
 
 
 %%--------------------------------------------------------------------
@@ -67,7 +60,6 @@ request_acl_hook(ClientId, Topic, Action, #http_request{method = Method, url = U
   Mod = acl,
   Params = [
     {server_key, ServerKey}
-    , {app_id, parser_app_by_clientId(ClientId)}
     , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
@@ -91,7 +83,7 @@ request_acl_hook(ClientId, Topic, Action, #http_request{method = Method, url = U
 
 handle_request_result(Json) ->
   JSONBody = jsx:decode(Json),
-  case lists:keyfind(<<"is_allow">>, 1, JSONBody) of {_, IsAllow} ->
+  case lists:keyfind(<<"acl_allow">>, 1, JSONBody) of {_, IsAllow} ->
     IsAllowFlag = validate_boolean(IsAllow),
     if IsAllowFlag ->
       allow;

@@ -28,7 +28,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [parser_app_by_clientId/1, parser_device_by_clientId/1, parser_username_by_clientId/1, validate_clientId/2, replace_str/3, format_from/1]).
+-import(emq_policy_server_util_format, [replace_str/3, format_from/1]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_logger, [errorLog/2, infoLog/2]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
@@ -118,7 +118,6 @@ request_subscribe_hook(Username, ClientId, TopicTable, Action, #http_request{met
   Mod = client,
   Params = [
     {server_key, ServerKey}
-    , {app_id, parser_app_by_clientId(ClientId)}
     , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
@@ -144,7 +143,6 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
   Mod = client,
   Params = [
     {server_key, ServerKey}
-    , {app_id, parser_app_by_clientId(ClientId)}
     , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
@@ -169,7 +167,6 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
   Mod = message,
   Params = [
     {server_key, ServerKey}
-    , {app_id, parser_app_by_clientId(ClientId)}
     , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
@@ -279,8 +276,8 @@ handleResultUnSub(_, _, _) ->
 handleTopic(Topic, ClientId, Username) ->
   try
     FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
-    FixAppId = replace_str(FixUsername, ":app_id", parser_app_by_clientId(ClientId)),
-    list_to_binary(FixAppId)
+    FixClientId = replace_str(FixUsername, ":client_id", ClientId),
+    list_to_binary(FixClientId)
   catch
     throw:_Term ->
       Topic;

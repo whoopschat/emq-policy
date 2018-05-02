@@ -30,7 +30,7 @@
 -include("emq_policy_server.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [validate_clientId/2, parser_app_by_clientId/1, validate_boolean/1, replace_str/3]).
+-import(emq_policy_server_util_format, [validate_boolean/1, replace_str/3]).
 -import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
 -import(emq_policy_server_util_binary, [trimBOM/1]).
 -import(emq_policy_server_util_logger, [errorLog/2, infoLog/2]).
@@ -47,13 +47,7 @@ check(#mqtt_client{username = Username}, Password, _Env) when ?UNDEFINED(Usernam
   {error, username_or_password_undefined};
 check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
   infoLog("~nauth log (user.auth):~nclient(~s/~s)~n", [Username, ClientId]),
-  IsClient = validate_clientId(ClientId, Username),
-  if
-    IsClient ->
-      request_auth_hook(ClientPid, ClientId, Username, Password, user_auth, env_http_request());
-    true ->
-      {error, "ClientId Format Error"}
-  end.
+  request_auth_hook(ClientPid, ClientId, Username, Password, user_auth, env_http_request()).
 
 
 %%--------------------------------------------------------------------
@@ -64,7 +58,6 @@ request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request
   Mod = auth,
   Params = [
     {server_key, ServerKey}
-    , {app_id, parser_app_by_clientId(ClientId)}
     , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
