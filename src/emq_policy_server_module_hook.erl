@@ -256,19 +256,19 @@ handleResultSub(_, _, _) ->
   ok.
 
 handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
-  try
+%%  try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
     Topics = [handleTopic(Topic, ClientId, Username) || Topic <- UnSubList],
-    ClientPid ! {unsubscribe, Topics}
-  catch
-    throw:Term ->
-      Term;
-    exit:Reason ->
-      Reason;
-    error:Reason ->
-      Reason
-  end,
+    ClientPid ! {unsubscribe, Topics},
+%%  catch
+%%    throw:Term ->
+%%      Term;
+%%    exit:Reason ->
+%%      Reason;
+%%    error:Reason ->
+%%      Reason
+%%  end,
   ok;
 handleResultUnSub(_, _, _) ->
   ok.
