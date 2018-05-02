@@ -180,7 +180,7 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handle_request_result(ClientId, Username, Json);
+        handle_request_result(ClientId, Json);
       true ->
         error
     end;
@@ -189,26 +189,26 @@ request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{m
       error
   end.
 
-handle_request_result(ClientId, Username, Json) ->
+handle_request_result(ClientId, Json) ->
   JSONBody = jsx:decode(Json),
   case lists:keyfind(<<"sub_list">>, 1, JSONBody) of {_, SubList} ->
-    handleResultSub(ClientId, Username, SubList);
+    handleResultSub(ClientId, SubList);
     _ ->
       true
   end,
   case lists:keyfind(<<"un_sub_list">>, 1, JSONBody) of {_, UnSubList} ->
-    handleResultUnSub(ClientId, Username, UnSubList);
+    handleResultUnSub(ClientId, UnSubList);
     _ ->
       true
   end,
   case lists:keyfind(<<"pub_list">>, 1, JSONBody) of {_, PubList} ->
-    handleResultPub(ClientId, Username, PubList);
+    handleResultPub(ClientId, PubList);
     _ ->
       true
   end,
   ok.
 
-handleResultPub(ClientId, _Username, PubList) when is_list(PubList) ->
+handleResultPub(ClientId, PubList) when is_list(PubList) ->
   try
     lists:map(fun(Pub) ->
       if is_list(Pub) ->
@@ -237,11 +237,11 @@ handleResultPub(ClientId, _Username, PubList) when is_list(PubList) ->
 handleResultPub(_, _, _) ->
   ok.
 
-handleResultSub(ClientId, Username, SubList) when is_list(SubList) ->
+handleResultSub(ClientId, SubList) when is_list(SubList) ->
   try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
-    TopicTable = [{handleTopic(Topic, Username), 1} || Topic <- SubList],
+    TopicTable = [{Topic, 1} || Topic <- SubList],
     ClientPid ! {subscribe, TopicTable}
   catch
     throw:Term ->
@@ -255,11 +255,11 @@ handleResultSub(ClientId, Username, SubList) when is_list(SubList) ->
 handleResultSub(_, _, _) ->
   ok.
 
-handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
+handleResultUnSub(ClientId, UnSubList) when is_list(UnSubList) ->
   try
     Client = emqttd_cm:lookup(ClientId),
     ClientPid = Client#mqtt_client.client_pid,
-    Topics = [handleTopic(Topic, Username) || Topic <- UnSubList],
+    Topics = [Topic || Topic <- UnSubList],
     ClientPid ! {unsubscribe, Topics}
   catch
     throw:Term ->
@@ -272,16 +272,3 @@ handleResultUnSub(ClientId, Username, UnSubList) when is_list(UnSubList) ->
   ok;
 handleResultUnSub(_, _, _) ->
   ok.
-
-handleTopic(Topic, Username) ->
-  try
-    FixUsername = replace_str(binary_to_list(Topic), ":username", binary_to_list(Username)),
-    list_to_binary(FixUsername)
-  catch
-    throw:_Term ->
-      Topic;
-    exit:_Reason ->
-      Topic;
-    error:_Reason ->
-      Topic
-  end.
