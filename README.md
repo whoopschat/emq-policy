@@ -2,7 +2,7 @@
 > A emq policy server plugin
 
 * github: [emq-policy-server](https://github.com/whoopschat/emq-policy-server)
-* doc: [doc](https://raw.githubusercontent.com/whoopschat/emq-policy-server/master/DOC.md)
+* doc: [doc](https://github.com/whoopschat/emq-policy-server/blob/master/DOC.md)
 
 ## Get Started
 * run `./run_pull.sh` pull project
