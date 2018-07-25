@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CURRENT_DIR=$(pwd)
+BIN_DIR=${CURRENT_DIR}/bin
 BUILD_DIR=${CURRENT_DIR}/build
 DATA_DIR=${CURRENT_DIR}/data
 EMQ_DIR=${BUILD_DIR}/emq-relx
@@ -11,7 +12,7 @@ EMQ_REL_X_REPO_GIT_BRANCH=release
 EMQ_REL_X_REPO_GIT_VERSION=2.3.5
 
 EMQ_RELEASE_DIR=${EMQ_DIR}/_rel
-EMQ_RELEASE_TARGET=${BUILD_DIR}/release_emqttd_${EMQ_REL_X_REPO_GIT_VERSION}.zip
+EMQ_RELEASE_TARGET=${BIN_DIR}/release_emq_${EMQ_REL_X_REPO_GIT_VERSION}.zip
 
 if [ ! -d ${BUILD_DIR} ]; then
 mkdir ${BUILD_DIR}
