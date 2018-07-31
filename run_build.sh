@@ -1,6 +1,6 @@
 #!/bin/bash
 CURRENT_DIR=$(pwd)
-VER=v2.3.11
+VER = v2.3.11
 
 BIN_DIR=${CURRENT_DIR}/bin
 BUILD_DIR=${CURRENT_DIR}/build
@@ -36,9 +36,18 @@ echo "|       Pull emq-relx from git        |"
 echo "======================================="
 echo -e
 
-rm -rf ${EMQ_DIR}
+if [ -d ${EMQ_DIR} ]; then
+cd ${EMQ_DIR}
+git fetch --all
+git reset --hard origin/master
+git pull
+else
 cd ${BUILD_DIR}
-git clone -b ${EMQ_REL_X_REPO_GIT_BRANCH} ${EMQ_REL_X_REPO_GIT}
+git clone ${EMQ_REL_X_REPO_GIT}
+fi
+
+cd ${EMQ_DIR}
+git checkout -b ${EMQ_REL_X_REPO_GIT_BRANCH}
 
 echo -e
 echo "======================================="
