@@ -3,6 +3,7 @@
 
 * github: [emq-policy-server](https://github.com/whoopschat/emq-policy-server)
 * doc: [doc](https://github.com/whoopschat/emq-policy-server/blob/master/DOC.md)
+* emq version: 2.3.11
 
 ## Get Started
 * run `./run_pull.sh` pull project
