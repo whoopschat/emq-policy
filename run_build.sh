@@ -1,6 +1,6 @@
 #!/bin/bash
 CURRENT_DIR=$(pwd)
-VER = 2.3.11
+VER=v2.3.11
 
 BIN_DIR=${CURRENT_DIR}/bin
 BUILD_DIR=${CURRENT_DIR}/build
@@ -9,7 +9,7 @@ EMQ_DIR=${BUILD_DIR}/emq-relx
 PROJECT_DEP_DIR=${EMQ_DIR}/deps/emq_policy_server
 
 EMQ_REL_X_REPO_GIT=https://github.com/emqtt/emq-relx
-EMQ_REL_X_REPO_GIT_BRANCH=v${VER}
+EMQ_REL_X_REPO_GIT_BRANCH=${VER}
 
 EMQ_RELEASE_DIR=${EMQ_DIR}/_rel
 EMQ_RELEASE_TARGET=${BIN_DIR}/release_emq_${VER}.zip

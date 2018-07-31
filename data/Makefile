@@ -14,17 +14,17 @@ DEPS += emq_policy_server
 dep_emq_policy_server = git https://github.com/whoopschat/emq-policy-server
 
 # emq deps
-dep_emqttd        = git https://github.com/emqtt/emqttd v${PROJECT_VERSION}
-dep_emq_modules   = git https://github.com/emqtt/emq-modules v${PROJECT_VERSION}
-dep_emq_dashboard = git https://github.com/emqtt/emq-dashboard v${PROJECT_VERSION}
-dep_emq_retainer  = git https://github.com/emqtt/emq-retainer v${PROJECT_VERSION}
-dep_emq_recon     = git https://github.com/emqtt/emq-recon v${PROJECT_VERSION}
-dep_emq_reloader  = git https://github.com/emqtt/emq-reloader v${PROJECT_VERSION}
+dep_emqttd        = git https://github.com/emqtt/emqttd ${PROJECT_VERSION}
+dep_emq_modules   = git https://github.com/emqtt/emq-modules ${PROJECT_VERSION}
+dep_emq_dashboard = git https://github.com/emqtt/emq-dashboard ${PROJECT_VERSION}
+dep_emq_retainer  = git https://github.com/emqtt/emq-retainer ${PROJECT_VERSION}
+dep_emq_recon     = git https://github.com/emqtt/emq-recon ${PROJECT_VERSION}
+dep_emq_reloader  = git https://github.com/emqtt/emq-reloader ${PROJECT_VERSION}
 
 # mqtt-sn, coap and stomp
-dep_emq_sn    = git https://github.com/emqtt/emq-sn v${PROJECT_VERSION}
-dep_emq_coap  = git https://github.com/emqtt/emq-coap v${PROJECT_VERSION}
-dep_emq_stomp = git https://github.com/emqtt/emq-stomp v${PROJECT_VERSION}
+dep_emq_sn    = git https://github.com/emqtt/emq-sn ${PROJECT_VERSION}
+dep_emq_coap  = git https://github.com/emqtt/emq-coap ${PROJECT_VERSION}
+dep_emq_stomp = git https://github.com/emqtt/emq-stomp ${PROJECT_VERSION}
 
 # COVER = true
 
