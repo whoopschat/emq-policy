@@ -1,6 +1,6 @@
 #!/bin/bash
 CURRENT_DIR=$(pwd)
-VER = v2.3.11
+VER=v2.3.11
 
 BIN_DIR=${CURRENT_DIR}/bin
 BUILD_DIR=${CURRENT_DIR}/build
@@ -31,9 +31,11 @@ rm -rf ${PROJECT_DEP_DIR}
 fi
 
 echo -e
-echo "======================================="
-echo "|       Pull emq-relx from git        |"
-echo "======================================="
+echo "========================================"
+echo "|        Pull emq-relx from git        |"
+echo "========================================"
+echo "===========  version:${VER}  ==========="
+echo "========================================"
 echo -e
 
 if [ -d ${EMQ_DIR} ]; then
