@@ -39,14 +39,14 @@ echo -e
 if [ -d ${EMQ_DIR} ]; then
 cd ${EMQ_DIR}
 git fetch --all
-git reset --hard origin/master
-git pull
+git reset --hard
 else
 cd ${BUILD_DIR}
 git clone ${EMQ_REL_X_REPO_GIT}
 fi
 
 cd ${EMQ_DIR}
+git pull
 git checkout -b ${EMQ_REL_X_REPO_GIT_BRANCH}
 
 echo -e
