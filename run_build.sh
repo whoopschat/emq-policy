@@ -36,13 +36,9 @@ echo "|       Pull emq-relx from git        |"
 echo "======================================="
 echo -e
 
-if [ -d ${EMQ_DIR} ]; then
-cd ${EMQ_DIR}
-git pull
-else
+rm -rf ${EMQ_DIR}
 cd ${BUILD_DIR}
 git clone -b ${EMQ_REL_X_REPO_GIT_BRANCH} ${EMQ_REL_X_REPO_GIT}
-fi
 
 echo -e
 echo "======================================="
@@ -54,7 +50,6 @@ cd ${CURRENT_DIR}
 cp ${DATA_DIR}/Makefile ${EMQ_DIR}/Makefile
 cp ${DATA_DIR}/relx.config ${EMQ_DIR}/relx.config
 cd ${EMQ_DIR}
-rm -rf ${EMQ_DIR}/deps/emp_policy_server
 make VER=${VER}
 
 if [ ! -d ${EMQ_RELEASE_DIR} ]; then
