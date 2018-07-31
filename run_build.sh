@@ -61,6 +61,7 @@ cd ${CURRENT_DIR}
 cp ${DATA_DIR}/Makefile ${EMQ_DIR}/Makefile
 cp ${DATA_DIR}/relx.config ${EMQ_DIR}/relx.config
 cd ${EMQ_DIR}
+rm -rf ${EMQ_DIR}/deps
 make VER=${VER}
 
 if [ ! -d ${EMQ_RELEASE_DIR} ]; then
