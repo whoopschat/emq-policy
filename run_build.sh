@@ -1,7 +1,6 @@
 #!/bin/bash
 CURRENT_DIR=$(pwd)
-
-VER = $(shell grep -Po 'version[" :]+\K[^"]+' ./version.json\')
+VER = 2.3.11
 
 BIN_DIR=${CURRENT_DIR}/bin
 BUILD_DIR=${CURRENT_DIR}/build
