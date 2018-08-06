@@ -1,5 +1,5 @@
 #!/bin/bash
-ROOT_DIR=$(pwd)/../
+ROOT_DIR=../
 VER=v2.3.11
 
 BIN_DIR=${ROOT_DIR}/bin
