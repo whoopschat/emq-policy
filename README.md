@@ -2,8 +2,9 @@
 > A emq policy plugin
 
 * github: [emq-policy](https://github.com/whoopschat/emq-policy)
-* doc: [doc](https://github.com/whoopschat/emq-policy/blob/master/DOC.md)
 * emq version: 2.3.11
+
+#### [release bin](bin)
 
 ## Get Started
 * run `./run_pull.sh` pull project

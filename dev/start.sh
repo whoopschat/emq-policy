@@ -1,8 +1,7 @@
 #!/bin/bash
 
-CURRENT_DIR=$(pwd)
-BUILD_DIR=${CURRENT_DIR}/build
-EMQ_DIR=${BUILD_DIR}/emq-relx
+ROOT_DIR=$(pwd)/../
+EMQ_DIR=${ROOT_DIR}/build/emq-relx
 
 echo -e
 echo "======================================="

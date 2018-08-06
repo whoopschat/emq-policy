@@ -1,5 +1,8 @@
 #!/bin/bash
 
+ROOT_DIR=$(pwd)/../
+cd ${ROOT_DIR}
+
 echo -e
 echo "======================================="
 echo "|        Pull project from git        |"
