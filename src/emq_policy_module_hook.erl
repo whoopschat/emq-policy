@@ -55,12 +55,12 @@ hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
 
 hook_session_subscribed(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nsession(~s/~s) subscribed: ~p~n", [Username, ClientId, TopicTable]),
-  request_subscribe_hook(ClientId, Username, TopicTable, session_subscribed, env_http_request()),
+  request_subscribe_hook(ClientId, Username, [TopicTable], session_subscribed, env_http_request()),
   {ok, TopicTable}.
 
 hook_session_unsubscribed(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nsession(~s/~s) unsubscribed: ~p", [Username, ClientId, TopicTable]),
-  request_subscribe_hook(ClientId, Username, TopicTable, session_unsubscribed, env_http_request()),
+  request_subscribe_hook(ClientId, Username, [TopicTable], session_unsubscribed, env_http_request()),
   ok.
 
 %% hook client connected

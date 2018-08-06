@@ -28,7 +28,7 @@ rm -rf ${EMQ_RELEASE_TARGET}
 fi
 
 if [ -d ${EMQ_DEP_DIR} ]; then
-rm -rf ${EMQ_DEP_DIR}
+rm -rf ${EMQ_DEP_DIR}/emq-policy
 fi
 
 echo -e
