@@ -218,7 +218,7 @@ handleResultPub(ClientId, PubList) when is_list(PubList) ->
             Topic = lists:nth(1, Pub),
             Payload = lists:nth(2, Pub),
             Msg = emqttd_message:make(ClientId, 1, Topic, Payload),
-            emqttd:publish(Msg#mqtt_message{retain = true}),
+            emqttd:publish(Msg),
             ok;
           true ->
             error
