@@ -1,5 +1,5 @@
-PROJECT = emq_policy_server
-PROJECT_DESCRIPTION = EMQ Policy Server
+PROJECT = emq_policy
+PROJECT_DESCRIPTION = EMQ Policy
 PROJECT_VERSION = 1.0.0
 
 BUILD_DEPS = emqttd cuttlefish
@@ -16,4 +16,4 @@ include erlang.mk
 app:: rebar.config
 
 app.config::
-	./deps/cuttlefish/cuttlefish -l info -e etc/ -c etc/emq_policy_server.conf -i priv/emq_policy_server.schema -d data
+	./deps/cuttlefish/cuttlefish -l info -e etc/ -c etc/emq_policy.conf -i priv/emq_policy.schema -d data

@@ -22,76 +22,74 @@
 %% SOFTWARE.
 %%%--------------------------------------------------------------------------------
 
--module(emq_policy_server_module_acl).
+-module(emq_policy_module_auth).
 
--behaviour(emqttd_acl_mod).
+-behaviour(emqttd_auth_mod).
 
 %% include
--include("emq_policy_server.hrl").
+-include("emq_policy.hrl").
 -include_lib("emqttd/include/emqttd.hrl").
 
--import(emq_policy_server_util_format, [validate_boolean/1]).
--import(emq_policy_server_util_http, [requestSync/3, env_http_request/0]).
--import(emq_policy_server_util_binary, [trimBOM/1]).
--import(emq_policy_server_util_logger, [errorLog/2, infoLog/2]).
+-import(emq_policy_util_format, [validate_boolean/1, replace_str/3]).
+-import(emq_policy_util_http, [requestSync/3, env_http_request/0]).
+-import(emq_policy_util_binary, [trimBOM/1]).
+-import(emq_policy_util_logger, [errorLog/2, infoLog/2]).
 
 %% Callbacks
--export([init/1, check_acl/2, reload_acl/1, description/0]).
+-export([init/1, check/3, description/0]).
 
 init(Env) ->
   {ok, Env}.
 
-check_acl({#mqtt_client{client_id = ClientId}, PubSub, Topic}, _Env) ->
-  access(PubSub, ClientId, Topic).
-
-reload_acl(_State) -> ok.
-
-access(subscribe, ClientId, Topic) ->
-  request_acl_hook(ClientId, Topic, subscribe_acl, env_http_request());
-access(publish, ClientId, Topic) ->
-  request_acl_hook(ClientId, Topic, publish_acl, env_http_request()).
-
+check(#mqtt_client{username = Username, client_id = ClientId, client_pid = ClientPid}, Password, _Env) ->
+  infoLog("~nauth log (user.auth):~nclient(~s/~s)~n", [Username, ClientId]),
+  request_auth_hook(ClientPid, ClientId, Username, Password, user_auth, env_http_request()).
 
 %%--------------------------------------------------------------------
 %% Request Hook
 %%--------------------------------------------------------------------
 
-request_acl_hook(ClientId, Topic, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
-  Mod = acl,
+request_auth_hook(ClientPid, ClientId, Username, Password, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+  Mod = auth,
   Params = [
     {server_key, ServerKey}
     , {module, Mod}
     , {action, Action}
     , {client_id, ClientId}
-    , {topic, Topic}
+    , {username, Username}
+    , {password, Password}
   ],
   case requestSync(Method, Url, Params) of {ok, Code, Body} ->
-    infoLog("~nrequest_acl_hook ~nCode: ~p,~nBody: ~p~n", [Code, Body]),
+    infoLog("~nrequest_auth_hook ~nCode: ~p,~nBody: ~p~n", [Code, Body]),
     Json = trimBOM(list_to_binary(Body)),
     IsJson = jsx:is_json(Json),
     if
       IsJson ->
-        handle_request_result(Json);
+        handle_request_result(ClientPid, ClientId, Username, Json);
       true ->
-        errorLog("~Acl Request JSON Format Error : ~p~n", [Body]),
-        deny
+        {error, "Auth Request JSON Format Error"}
     end;
     {error, Error} ->
       errorLog("~naction: ~p~nError: ~p~n", [Action, Error]),
-      deny
+      {error, Error}
   end.
 
-handle_request_result(Json) ->
+handle_request_result(_ClientPid, _ClientId, _Username, Json) ->
   JSONBody = jsx:decode(Json),
-  case lists:keyfind(<<"acl_allow">>, 1, JSONBody) of {_, IsAllow} ->
-    IsAllowFlag = validate_boolean(IsAllow),
-    if IsAllowFlag ->
-      allow;
+  case lists:keyfind(<<"is_user">>, 1, JSONBody) of {_, IsUser} ->
+    IsUserFlag = validate_boolean(IsUser),
+    if IsUserFlag ->
+      case lists:keyfind(<<"is_super">>, 1, JSONBody) of {_, IsSuper} ->
+        IsSuperFlag = validate_boolean(IsSuper),
+        {ok, IsSuperFlag};
+        _ ->
+          {ok, false}
+      end;
       true ->
-        deny
+        {error, "Auth Failure"}
     end;
     _ ->
-      deny
+      {error, "Auth Failure"}
   end.
 
-description() -> "Emq Policy Server ACL module".
+description() -> "Emq Policy Server AUTH module".

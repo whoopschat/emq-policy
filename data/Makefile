@@ -10,8 +10,8 @@ DEPS += emqttd emq_modules emq_dashboard emq_retainer emq_recon emq_reloader \
         emq_sn emq_coap emq_stomp
 
 # emq policy server
-DEPS += emq_policy_server
-dep_emq_policy_server = git https://github.com/whoopschat/emq-policy-server
+DEPS += emq_policy
+dep_emq_policy = git https://github.com/whoopschat/emq-policy
 
 # emq deps
 dep_emqttd        = git https://github.com/emqtt/emqttd ${PROJECT_VERSION}
