@@ -14,11 +14,14 @@
 %% hooks
 -export([hook_client_subscribe/4, hook_client_unsubscribe/4]).
 -export([hook_client_connected/3, hook_client_disconnected/3]).
+-export([hook_session_subscribed/4, hook_session_unsubscribed/4]).
 -export([hook_message_publish/2, hook_message_delivered/4, hook_message_ack/4]).
 
 load(Env) ->
   emqttd:hook('client.subscribe', fun ?MODULE:hook_client_subscribe/4, [Env]),
   emqttd:hook('client.unsubscribe', fun ?MODULE:hook_client_unsubscribe/4, [Env]),
+  emqttd:hook('session.subscribed', fun ?MODULE:hook_session_subscribed/4, [Env]),
+  emqttd:hook('session.unsubscribed', fun ?MODULE:hook_session_unsubscribed/4, [Env]),
   emqttd:hook('client.connected', fun ?MODULE:hook_client_connected/3, [Env]),
   emqttd:hook('client.disconnected', fun ?MODULE:hook_client_disconnected/3, [Env]),
   emqttd:hook('message.publish', fun ?MODULE:hook_message_publish/2, [Env]),
@@ -28,6 +31,8 @@ load(Env) ->
 unload() ->
   emqttd:unhook('client.subscribe', fun ?MODULE:hook_client_subscribe/4),
   emqttd:unhook('client.unsubscribe', fun ?MODULE:hook_client_unsubscribe/4),
+  emqttd:unhook('session.subscribed', fun ?MODULE:hook_session_subscribed/4),
+  emqttd:unhook('session.unsubscribed', fun ?MODULE:hook_session_unsubscribed/4),
   emqttd:unhook('client.connected', fun ?MODULE:hook_client_connected/3),
   emqttd:unhook('client.disconnected', fun ?MODULE:hook_client_disconnected/3),
   emqttd:unhook('message.publish', fun ?MODULE:hook_message_publish/2),
@@ -47,6 +52,16 @@ hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
   request_subscribe_hook(ClientId, Username, TopicTable, client_unsubscribe, env_http_request()),
   {ok, TopicTable}.
+
+hook_session_subscribed(ClientId, Username, TopicTable, _Env) ->
+  infoLog("~nsession(~s/~s) subscribed: ~p~n", [Username, ClientId, TopicTable]),
+  request_subscribe_hook(ClientId, Username, TopicTable, session_subscribed, env_http_request()),
+  {ok, TopicTable}.
+
+hook_session_unsubscribed(ClientId, Username, TopicTable, _Env) ->
+  infoLog("~nsession(~s/~s) unsubscribed: ~p", [Username, ClientId, TopicTable]),
+  request_subscribe_hook(ClientId, Username, TopicTable, session_unsubscribed, env_http_request()),
+  ok.
 
 %% hook client connected
 hook_client_connected(ConnAck, Client = #mqtt_client{client_id = ClientId}, _Env) ->
