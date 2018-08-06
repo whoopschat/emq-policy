@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT_DIR=..
+ROOT_DIR=$(pwd)/..
 cd ${ROOT_DIR}
 
 echo -e
@@ -13,4 +13,4 @@ git fetch --all
 git reset --hard origin/master
 git pull
 
-chmod 777 -R *.sh
+chmod 777 -R **/*.sh

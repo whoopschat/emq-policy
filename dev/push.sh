@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT_DIR=..
+ROOT_DIR=$(pwd)/..
 cd ${ROOT_DIR}
 
 echo -e

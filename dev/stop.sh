@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROOT_DIR=..
+ROOT_DIR=$(pwd)/..
 EMQ_DIR=${ROOT_DIR}/build/emq-relx
 
 echo -e
