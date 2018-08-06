@@ -53,14 +53,14 @@ hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
   request_subscribe_hook(ClientId, Username, TopicTable, client_unsubscribe, env_http_request()),
   {ok, TopicTable}.
 
-hook_session_subscribed(ClientId, Username, TopicTable, _Env) ->
-  infoLog("~nsession(~s/~s) subscribed: ~p~n", [Username, ClientId, TopicTable]),
-  request_subscribe_hook(ClientId, Username, [TopicTable], session_subscribed, env_http_request()),
-  {ok, TopicTable}.
+hook_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
+  infoLog("~nsession(~s/~s) subscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
+  request_subscribe_hook(ClientId, Username, [Topic], session_subscribed, env_http_request()),
+  {ok, {Topic, Opts}}.
 
-hook_session_unsubscribed(ClientId, Username, TopicTable, _Env) ->
-  infoLog("~nsession(~s/~s) unsubscribed: ~p", [Username, ClientId, TopicTable]),
-  request_subscribe_hook(ClientId, Username, [TopicTable], session_unsubscribed, env_http_request()),
+hook_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
+  infoLog("~nsession(~s/~s) unsubscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
+  request_subscribe_hook(ClientId, Username, [Topic], session_unsubscribed, env_http_request()),
   ok.
 
 %% hook client connected
