@@ -95,26 +95,26 @@ hook_message_publish(Message = #mqtt_message{topic = <<"$SYS/", _/binary>>}, _En
 hook_message_publish(Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   infoLog("~nmessage log (message.publish):~npublish ~s~n", [emqttd_message:format(Message)]),
   {FromClientId, FromUsername} = format_from(Message#mqtt_message.from),
-  request_message_hook(Topic, Payload, FromClientId, FromUsername, message_publish, env_http_request()),
+  request_message_hook(FromClientId, FromUsername, Topic, Payload, message_publish, env_http_request()),
   {ok, Message}.
 
 %% hook message delivered
 hook_message_delivered(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   infoLog("~nmessage log (message.delivered):~ndelivered to client(~s/~s): ~s~n", [Username, ClientId, emqttd_message:format(Message)]),
-  request_message_hook(Topic, Payload, ClientId, Username, message_delivered, env_http_request()),
+  request_message_hook(ClientId, Username, Topic, Payload, message_delivered, env_http_request()),
   {ok, Message}.
 
 %% hook message ask
 hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payload = Payload}, _Env) ->
   infoLog("~nmessage log (message.acked):~nclient(~s/~s) acked: ~s~n", [Username, ClientId, emqttd_message:format(Message)]),
-  request_message_hook(Topic, Payload, ClientId, Username, message_ask, env_http_request()),
+  request_message_hook(ClientId, Username, Topic, Payload, message_ask, env_http_request()),
   {ok, Message}.
 
 %%--------------------------------------------------------------------
 %% Request Hook
 %%--------------------------------------------------------------------
 
-request_subscribe_hook(Username, ClientId, TopicTable, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+request_subscribe_hook(ClientId, Username, TopicTable, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = client,
   Params = [
     {server_key, ServerKey}
@@ -139,7 +139,7 @@ request_subscribe_hook(Username, ClientId, TopicTable, Action, #http_request{met
       error
   end.
 
-request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+request_connect_hook(#mqtt_client{client_id = ClientId, username = Username}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = client,
   Params = [
     {server_key, ServerKey}
@@ -163,7 +163,7 @@ request_connect_hook(#mqtt_client{username = Username, client_id = ClientId}, Ac
       error
   end.
 
-request_message_hook(Topic, Payload, ClientId, Username, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+request_message_hook(ClientId, Username, Topic, Payload, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = message,
   Params = [
     {server_key, ServerKey}
