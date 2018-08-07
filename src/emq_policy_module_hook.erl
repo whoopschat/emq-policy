@@ -45,34 +45,34 @@ unload() ->
 
 hook_client_subscribe(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nclient log (client.subscribe):~nclient(~s/~s) will subscribe: ~p~n", [Username, ClientId, TopicTable]),
-  request_subscribe_hook(ClientId, Username, TopicTable, client_subscribe, env_http_request()),
+  request_client_subscribe_hook(ClientId, Username, TopicTable, client_subscribe, env_http_request()),
   {ok, TopicTable}.
 
 hook_client_unsubscribe(ClientId, Username, TopicTable, _Env) ->
   infoLog("~nclient log (client.unsubscribe):~nclient(~s/~s) unsubscribe ~p~n", [ClientId, Username, TopicTable]),
-  request_subscribe_hook(ClientId, Username, TopicTable, client_unsubscribe, env_http_request()),
+  request_client_subscribe_hook(ClientId, Username, TopicTable, client_unsubscribe, env_http_request()),
   {ok, TopicTable}.
 
 hook_session_subscribed(ClientId, Username, {Topic, Opts}, _Env) ->
   infoLog("~nsession(~s/~s) subscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
-  request_subscribe_hook(ClientId, Username, [Topic], session_subscribed, env_http_request()),
+  request_session_subscribe_hook(ClientId, Username, Topic, session_subscribed, env_http_request()),
   {ok, {Topic, Opts}}.
 
 hook_session_unsubscribed(ClientId, Username, {Topic, Opts}, _Env) ->
   infoLog("~nsession(~s/~s) unsubscribed: ~p~n", [Username, ClientId, {Topic, Opts}]),
-  request_subscribe_hook(ClientId, Username, [Topic], session_unsubscribed, env_http_request()),
+  request_session_subscribe_hook(ClientId, Username, Topic, session_unsubscribed, env_http_request()),
   ok.
 
 %% hook client connected
 hook_client_connected(ConnAck, Client = #mqtt_client{client_id = ClientId}, _Env) ->
   infoLog("~nclient log (client.connected):~nclient ~s connected, connack: ~w~n", [ClientId, ConnAck]),
-  request_connect_hook(Client, client_connected, env_http_request()),
+  request_client_connect_hook(Client, client_connected, env_http_request()),
   {ok, Client}.
 
 %% hook client connected
 hook_client_disconnected(Reason, Client = #mqtt_client{client_id = ClientId}, _Env) ->
   infoLog("~nclient log (client.disconnected):~nclient ~s disconnected, reason: ~w~n", [ClientId, Reason]),
-  request_connect_hook(Client, client_disconnected, env_http_request()),
+  request_client_connect_hook(Client, client_disconnected, env_http_request()),
   ok.
 
 %%--------------------------------------------------------------------
@@ -105,7 +105,32 @@ hook_message_ack(ClientId, Username, Message = #mqtt_message{topic = Topic, payl
 %% Request Hook
 %%--------------------------------------------------------------------
 
-request_subscribe_hook(ClientId, Username, TopicTable, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+request_session_subscribe_hook(ClientId, Username, Topic, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+  Mod = session,
+  Params = [
+    {server_key, ServerKey}
+    , {module, Mod}
+    , {action, Action}
+    , {client_id, ClientId}
+    , {username, Username}
+    , {topic, Topic}
+  ],
+  case requestSync(Method, Url, Params) of {ok, Code, Body} ->
+    infoLog("~naction: ~p~nCode: ~p~nBody: ~p~n", [Action, Code, Body]),
+    Json = trimBOM(list_to_binary(Body)),
+    IsJson = jsx:is_json(Json),
+    if
+      IsJson ->
+        handle_request_result(ClientId, Json);
+      true ->
+        error
+    end;
+    {error, Error} ->
+      errorLog("~naction: ~p~nError: ~p~n", [Action, Error]),
+      error
+  end.
+
+request_client_subscribe_hook(ClientId, Username, TopicTable, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = client,
   Params = [
     {server_key, ServerKey}
@@ -130,7 +155,7 @@ request_subscribe_hook(ClientId, Username, TopicTable, Action, #http_request{met
       error
   end.
 
-request_connect_hook(#mqtt_client{client_id = ClientId, username = Username}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
+request_client_connect_hook(#mqtt_client{client_id = ClientId, username = Username}, Action, #http_request{method = Method, url = Url, server_key = ServerKey}) ->
   Mod = client,
   Params = [
     {server_key, ServerKey}
