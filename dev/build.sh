@@ -19,6 +19,10 @@ if [ ! -d ${BUILD_DIR} ]; then
 mkdir ${BUILD_DIR}
 fi
 
+if [ ! -d ${BIN_DIR} ]; then
+mkdir ${BIN_DIR}
+fi
+
 if [ -d ${EMQ_RELEASE_DIR} ]; then
 rm -rf ${EMQ_RELEASE_DIR}
 fi
